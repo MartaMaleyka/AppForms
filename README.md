@@ -16,11 +16,13 @@ Una aplicación web tipo Google Forms para crear, compartir y gestionar formular
 - **Compartir formularios** mediante enlaces directos
 - **Recibir respuestas** en tiempo real
 - **Ver estadísticas** de respuestas con gráficos
+- **Eliminar formularios** con confirmación de seguridad
 - **Interfaz moderna** y responsive
 - **Almacenamiento en archivos JSON** para simplicidad
 - 🔐 **Sistema de Autenticación**: Login y registro de usuarios
 - 📝 **Creación de Formularios**: Interfaz intuitiva para crear formularios personalizados
 - 📊 **Visualización de Respuestas**: Análisis detallado de las respuestas recibidas
+- 🗑️ **Gestión de Formularios**: Eliminar formularios y sus respuestas asociadas
 - 🎨 **Interfaz Moderna**: Diseño responsive y atractivo
 - 🔒 **Rutas Protegidas**: Acceso seguro a funcionalidades administrativas
 
@@ -127,6 +129,15 @@ Una aplicación web tipo Google Forms para crear, compartir y gestionar formular
    - Estadísticas por pregunta
    - Gráficos de distribución para preguntas de opciones
 
+### 4. Eliminar Formularios
+
+1. En la página principal, busca el formulario que deseas eliminar
+2. Haz clic en el botón "🗑️ Eliminar"
+3. Confirma la acción en el diálogo de confirmación
+4. El formulario y todas sus respuestas serán eliminados permanentemente
+
+> ⚠️ **Importante**: La eliminación de formularios es irreversible. Todos los datos del formulario y sus respuestas se eliminarán permanentemente.
+
 ## 📁 Estructura de Datos
 
 ### Archivos JSON
@@ -198,6 +209,25 @@ Todos los estilos están en archivos CSS separados por componente para fácil pe
 
 - Validación de datos en frontend y backend
 - Sanitización de inputs
+- Autenticación JWT para operaciones sensibles
+- Confirmación de usuario para acciones destructivas
+
+## 🔌 API Endpoints
+
+### Autenticación
+- `POST /api/auth/register` - Registrar nuevo usuario
+- `POST /api/auth/login` - Iniciar sesión
+- `GET /api/auth/me` - Obtener información del usuario actual
+
+### Formularios
+- `GET /api/forms` - Obtener todos los formularios
+- `POST /api/forms` - Crear nuevo formulario (requiere autenticación)
+- `GET /api/forms/:id` - Obtener formulario específico
+- `DELETE /api/forms/:id` - Eliminar formulario y sus respuestas (requiere autenticación)
+
+### Respuestas
+- `POST /api/forms/:id/responses` - Enviar respuesta a un formulario
+- `GET /api/forms/:id/responses` - Obtener respuestas de un formulario (requiere autenticación)
 - Almacenamiento local en archivos JSON
 - 🔐 **Sistema de Autenticación**: Login y registro de usuarios
 - **Contraseñas hasheadas con bcrypt**

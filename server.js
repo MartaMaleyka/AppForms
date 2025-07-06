@@ -110,17 +110,26 @@ async function initializeData() {
 
 // Authentication middleware
 function authenticateToken(req, res, next) {
+  console.log('Authenticating request for:', req.method, req.path);
+  console.log('Headers:', req.headers);
+  
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
+  console.log('Auth header:', authHeader);
+  console.log('Token:', token);
+
   if (!token) {
+    console.log('No token provided');
     return res.status(401).json({ error: 'Access token required' });
   }
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
+      console.log('Token verification failed:', err.message);
       return res.status(403).json({ error: 'Invalid or expired token' });
     }
+    console.log('Token verified successfully, user:', user);
     req.user = user;
     next();
   });
@@ -363,6 +372,43 @@ app.get('/api/forms/:id/responses', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Error reading responses:', error);
     res.status(500).json({ error: 'Error reading responses' });
+  }
+});
+
+// Delete a form
+app.delete('/api/forms/:id', authenticateToken, async (req, res) => {
+  try {
+    console.log('Delete request received for form ID:', req.params.id);
+    console.log('User:', req.user);
+    
+    const formId = parseInt(req.params.id);
+    const forms = await readForms();
+    const responses = await readResponses();
+    
+    console.log('Total forms:', forms.length);
+    console.log('Form IDs:', forms.map(f => f.id));
+    
+    const formIndex = forms.findIndex(f => f.id === formId);
+    console.log('Form index:', formIndex);
+    
+    if (formIndex === -1) {
+      console.log('Form not found');
+      return res.status(404).json({ error: 'Form not found' });
+    }
+    
+    // Remove the form
+    forms.splice(formIndex, 1);
+    await writeForms(forms);
+    
+    // Remove all responses for this form
+    const filteredResponses = responses.filter(r => r.form_id !== formId);
+    await writeResponses(filteredResponses);
+    
+    console.log('Form deleted successfully');
+    res.json({ message: 'Form deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting form:', error);
+    res.status(500).json({ error: 'Error deleting form' });
   }
 });
 

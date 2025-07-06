@@ -2,9 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs').promises;
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 // Middleware
 app.use(cors());
@@ -14,6 +17,7 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 // Data files
 const FORMS_FILE = './data/forms.json';
 const RESPONSES_FILE = './data/responses.json';
+const USERS_FILE = './data/users.json';
 
 // Ensure data directory exists
 async function ensureDataDirectory() {
@@ -37,6 +41,21 @@ async function initializeDataFiles() {
   } catch {
     await fs.writeFile(RESPONSES_FILE, JSON.stringify([], null, 2));
   }
+
+  try {
+    await fs.access(USERS_FILE);
+  } catch {
+    // Create default admin user
+    const defaultUsers = [{
+      id: 1,
+      username: 'admin',
+      email: 'admin@example.com',
+      password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+      role: 'admin',
+      created_at: new Date().toISOString()
+    }];
+    await fs.writeFile(USERS_FILE, JSON.stringify(defaultUsers, null, 2));
+  }
 }
 
 // Read data from JSON files
@@ -58,6 +77,16 @@ async function readResponses() {
   }
 }
 
+// Read users from JSON file
+async function readUsers() {
+  try {
+    const data = await fs.readFile(USERS_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    return [];
+  }
+}
+
 // Write data to JSON files
 async function writeForms(forms) {
   await fs.writeFile(FORMS_FILE, JSON.stringify(forms, null, 2));
@@ -67,6 +96,11 @@ async function writeResponses(responses) {
   await fs.writeFile(RESPONSES_FILE, JSON.stringify(responses, null, 2));
 }
 
+// Write users to JSON file
+async function writeUsers(users) {
+  await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+}
+
 // Initialize data
 async function initializeData() {
   await ensureDataDirectory();
@@ -74,10 +108,142 @@ async function initializeData() {
   console.log('Data files initialized successfully');
 }
 
+// Authentication middleware
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+    req.user = user;
+    next();
+  });
+}
+
 // API Routes
 
+// Authentication endpoints
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    const users = await readUsers();
+    
+    // Check if user already exists
+    const existingUser = users.find(u => u.username === username || u.email === email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'Username or email already exists' });
+    }
+    
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const newUser = {
+      id: Date.now(),
+      username,
+      email,
+      password: hashedPassword,
+      role: 'user',
+      created_at: new Date().toISOString()
+    };
+    
+    users.push(newUser);
+    await writeUsers(users);
+    
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: newUser.id, username: newUser.username, role: newUser.role },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    res.json({
+      message: 'User registered successfully',
+      token,
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        role: newUser.role
+      }
+    });
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({ error: 'Error registering user' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const users = await readUsers();
+    
+    // Find user by username or email
+    const user = users.find(u => u.username === username || u.email === username);
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    
+    // Check password
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    res.json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(500).json({ error: 'Error logging in' });
+  }
+});
+
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
+  try {
+    const users = await readUsers();
+    const user = users.find(u => u.id === req.user.id);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json({
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error('Error getting user info:', error);
+    res.status(500).json({ error: 'Error getting user info' });
+  }
+});
+
+// Protected routes - require authentication
 // Create a new form
-app.post('/api/forms', async (req, res) => {
+app.post('/api/forms', authenticateToken, async (req, res) => {
   try {
     const { title, description, questions } = req.body;
     const forms = await readForms();
@@ -165,7 +331,7 @@ app.post('/api/forms/:id/responses', async (req, res) => {
 });
 
 // Get form responses
-app.get('/api/forms/:id/responses', async (req, res) => {
+app.get('/api/forms/:id/responses', authenticateToken, async (req, res) => {
   try {
     const formId = parseInt(req.params.id);
     const responses = await readResponses();

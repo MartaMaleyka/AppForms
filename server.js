@@ -267,6 +267,7 @@ app.post('/api/forms', authenticateToken, async (req, res) => {
         question_type: q.question_type,
         options: q.options || [],
         required: q.required,
+        skip_logic: q.skip_logic || { enabled: false, conditions: [] },
         order_index: index
       })),
       created_at: new Date().toISOString()

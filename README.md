@@ -1,275 +1,312 @@
-# 📋 Forms App - Aplicación de Formularios
 
-Una aplicación web tipo Google Forms para crear, compartir y gestionar formularios personalizados usando archivos JSON.
 
-## 🚀 Características
+# Sistema de Formularios Dinámicos
 
-- **Crear formularios personalizados** con diferentes tipos de preguntas:
-  - Texto corto
-  - Texto largo
-  - Opción única (radio)
-  - Múltiples opciones (checkbox)
-  - Lista desplegable (select)
-  - Fecha
-  - Hora
-  - Fecha y Hora
-- **Compartir formularios** mediante enlaces directos
-- **Recibir respuestas** en tiempo real
-- **Ver estadísticas** de respuestas con gráficos
-- **Eliminar formularios** con confirmación de seguridad
+Una aplicación web completa para crear y gestionar formularios con lógica condicional avanzada y exportación de datos.
+
+## Características Principales
+
+### ✨ Funcionalidades Básicas
+- **Creación de formularios** con múltiples tipos de preguntas
+- **Autenticación de usuarios** con JWT
+- **Gestión de respuestas** y visualización de resultados
 - **Interfaz moderna** y responsive
-- **Almacenamiento en archivos JSON** para simplicidad
-- 🔐 **Sistema de Autenticación**: Login y registro de usuarios
-- 📝 **Creación de Formularios**: Interfaz intuitiva para crear formularios personalizados
-- 📊 **Visualización de Respuestas**: Análisis detallado de las respuestas recibidas
-- 🗑️ **Gestión de Formularios**: Eliminar formularios y sus respuestas asociadas
-- 🎨 **Interfaz Moderna**: Diseño responsive y atractivo
-- 🔒 **Rutas Protegidas**: Acceso seguro a funcionalidades administrativas
 
-## 🛠️ Tecnologías Utilizadas
+### 🎯 Lógica Condicional (Skip Logic)
+- **Mostrar/ocultar preguntas** según las respuestas del usuario
+- **Saltos dinámicos** entre preguntas
+- **Múltiples condiciones** por pregunta
+- **Soporte para todos los tipos de preguntas** (radio, checkbox, select)
 
-### Backend
-- **Node.js** - Runtime de JavaScript
-- **Express** - Framework web
-- **Archivos JSON** - Almacenamiento de datos
-- **CORS** - Middleware para peticiones cross-origin
-- **bcryptjs** - Para hashear contraseñas
-- **jsonwebtoken** - Para generar tokens JWT
+### 📊 Exportación de Datos
+- **Exportar a Excel** (.xlsx) con formato profesional
+- **Incluir todas las respuestas** de los formularios
+- **Datos organizados** por pregunta y respondente
+- **Filtros y ordenamiento** de datos
 
-### Frontend
-- **React** - Biblioteca de interfaz de usuario
-- **TypeScript** - Tipado estático
-- **React Router** - Navegación
-- **CSS3** - Estilos modernos y responsive
+## Tipos de Preguntas Soportados
 
-## 📦 Instalación
+- **Texto corto** - Respuestas de una línea
+- **Texto largo** - Respuestas multilínea
+- **Opción única** - Radio buttons
+- **Múltiples opciones** - Checkboxes
+- **Lista desplegable** - Select dropdown
+- **Fecha** - Selector de fecha
+- **Hora** - Selector de hora
+- **Fecha y Hora** - Selector combinado
+
+## Configuración de Lógica Condicional
+
+### Cómo Funciona
+1. **Activar skip logic** en cualquier pregunta
+2. **Configurar condiciones**: "Si el usuario selecciona X, entonces..."
+3. **Definir destino**: Ir a otra pregunta o finalizar formulario
+4. **Aplicación automática**: Las preguntas se ocultan/muestran dinámicamente
+
+### Ejemplo de Uso
+```
+Pregunta 1: "¿Has usado nuestro servicio?"
+- Opciones: "Sí" / "No"
+
+Condición: Si selecciona "No" → Saltar a Pregunta 5
+Resultado: Las preguntas 2, 3, 4 se ocultan automáticamente
+```
+
+## Exportación a Excel
+
+### Características de la Exportación
+- **Formato .xlsx** compatible con Microsoft Excel y Google Sheets
+- **Hoja de respuestas** con todas las respuestas organizadas
+- **Información del respondente** (nombre, fecha de envío)
+- **Preguntas y respuestas** en columnas separadas
+- **Datos limpios** y fáciles de analizar
+
+### Cómo Exportar
+1. **Acceder a las respuestas** del formulario
+2. **Hacer clic en "Exportar a Excel"**
+3. **Descargar automáticamente** el archivo .xlsx
+4. **Abrir en Excel** o cualquier aplicación compatible
+
+### Estructura del Excel Exportado
+```
+| Respondente | Fecha de Envío | Pregunta 1 | Pregunta 2 | Pregunta 3 | ...
+|-------------|----------------|------------|------------|------------|-----
+| Juan Pérez  | 2024-01-15     | Sí         | Premium    | Excelente  | ...
+| María López | 2024-01-15     | No         | -          | -          | ...
+```
+
+## Instalación y Configuración
 
 ### Prerrequisitos
-- Node.js (versión 14 o superior)
+- Node.js (v14 o superior)
 - npm o yarn
 
-### Pasos de instalación
+### Instalación
 
 1. **Clonar el repositorio**
-   ```bash
-   git clone <url-del-repositorio>
-   cd Forms
-   ```
+```bash
+git clone <repository-url>
+cd Forms
+```
 
-2. **Instalar dependencias del backend**
-   ```bash
-   npm install
-   ```
+2. **Instalar dependencias**
+```bash
+npm install
+cd client
+npm install
+```
 
-3. **Instalar dependencias del frontend**
-   ```bash
-   cd client
-   npm install
-   cd ..
-   ```
+3. **Configurar variables de entorno**
+```bash
+# En el directorio raíz, crear .env
+JWT_SECRET=tu-clave-secreta-aqui
+```
 
-## 🚀 Ejecución
+4. **Iniciar la aplicación**
+```bash
+# Terminal 1 - Servidor backend
+npm start
 
-### Desarrollo
+# Terminal 2 - Cliente React
+cd client
+npm start
+```
 
-1. **Iniciar el servidor backend**
-   ```bash
-   npm run dev
-   ```
-   El servidor se ejecutará en `http://localhost:5000`
+### Acceso
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000
 
-2. **Iniciar el frontend** (en otra terminal)
-   ```bash
-   cd client
-   npm start
-   ```
-   La aplicación se abrirá en `http://localhost:3000`
+## Estructura del Proyecto
 
-### Producción
+```
+Forms/
+├── client/                 # Aplicación React
+│   ├── src/
+│   │   ├── components/    # Componentes principales
+│   │   │   ├── FormBuilder.tsx    # Constructor de formularios
+│   │   │   ├── FormView.tsx       # Vista de formularios
+│   │   │   ├── FormResponses.tsx  # Gestión de respuestas
+│   │   │   └── ...
+│   │   └── contexts/      # Contextos de React
+├── data/                  # Archivos de datos JSON
+│   ├── forms.json         # Formularios guardados
+│   ├── responses.json     # Respuestas de usuarios
+│   └── users.json         # Usuarios del sistema
+└── server.js              # Servidor Express
+```
 
-1. **Construir el frontend**
-   ```bash
-   npm run build
-   ```
+## API Endpoints
 
-2. **Iniciar en modo producción**
-   ```bash
-   npm start
-   ```
+### Autenticación
+- `POST /api/auth/register` - Registro de usuarios
+- `POST /api/auth/login` - Inicio de sesión
+- `GET /api/auth/me` - Información del usuario actual
 
-## 📖 Uso de la Aplicación
+### Formularios
+- `GET /api/forms` - Listar todos los formularios
+- `POST /api/forms` - Crear nuevo formulario
+- `GET /api/forms/:id` - Obtener formulario específico
+- `DELETE /api/forms/:id` - Eliminar formulario
 
-### 1. Crear un Formulario
+### Respuestas
+- `POST /api/forms/:id/responses` - Enviar respuesta
+- `GET /api/forms/:id/responses` - Ver respuestas (requiere auth)
+- `GET /api/forms/:id/responses/export` - Exportar respuestas a Excel
 
-1. Ve a la página principal
-2. Haz clic en "Crear Nuevo Formulario"
-3. Completa la información del formulario:
-   - **Título**: Nombre del formulario
-   - **Descripción**: Explicación opcional
-4. Agrega preguntas:
-   - Haz clic en "+ Agregar Pregunta"
-   - Selecciona el tipo de pregunta
-   - Escribe el texto de la pregunta
-   - Para preguntas de opciones, agrega las opciones disponibles
-   - Marca como obligatoria si es necesario
-5. Haz clic en "Crear Formulario"
+## Ejemplo de Formulario con Lógica Condicional
 
-### 2. Compartir el Formulario
+El sistema incluye un formulario de ejemplo que demuestra la funcionalidad:
 
-1. Una vez creado, serás redirigido al formulario
-2. Copia la URL del navegador
-3. Comparte el enlace con los encuestados
+**"Encuesta de Satisfacción del Cliente"**
+- Pregunta 2: Si selecciona "Ninguno aún" → Salta a Pregunta 5
+- Pregunta 3: Si selecciona "Ninguno" → Salta a Pregunta 6
+- Pregunta 4: Si selecciona calificaciones bajas (1-3) → Salta a Pregunta 6
 
-### 3. Ver Respuestas
+## Características Técnicas
 
-1. En la página principal, busca tu formulario
-2. Haz clic en "Ver Respuestas"
-3. Visualiza:
-   - Tabla con todas las respuestas
-   - Estadísticas por pregunta
-   - Gráficos de distribución para preguntas de opciones
+### Frontend
+- **React 18** con TypeScript
+- **React Router** para navegación
+- **Context API** para estado global
+- **CSS Modules** para estilos
+- **Responsive design** para móviles
+- **ExcelJS** para exportación de datos
 
-### 4. Eliminar Formularios
+### Backend
+- **Node.js** con Express
+- **JWT** para autenticación
+- **Almacenamiento JSON** (sin base de datos)
+- **CORS** habilitado
+- **Validación de datos** completa
+- **ExcelJS** para generación de archivos Excel
 
-1. En la página principal, busca el formulario que deseas eliminar
-2. Haz clic en el botón "🗑️ Eliminar"
-3. Confirma la acción en el diálogo de confirmación
-4. El formulario y todas sus respuestas serán eliminados permanentemente
+### Lógica Condicional
+- **Evaluación en tiempo real** de condiciones
+- **Cálculo dinámico** de preguntas visibles
+- **Soporte para múltiples condiciones** por pregunta
+- **Validación de formularios** considerando preguntas ocultas
 
-> ⚠️ **Importante**: La eliminación de formularios es irreversible. Todos los datos del formulario y sus respuestas se eliminarán permanentemente.
+### Exportación de Datos
+- **Generación de Excel** con formato profesional
+- **Inclusión de metadatos** (fecha, respondente)
+- **Organización por preguntas** en columnas
+- **Compatibilidad** con múltiples aplicaciones
 
-## 📁 Estructura de Datos
+## Desarrollo
 
-### Archivos JSON
+### Comandos Útiles
 
-- **`data/forms.json`**: Almacena todos los formularios creados
-- **`data/responses.json`**: Almacena todas las respuestas recibidas
+```bash
+# Ejecutar tests
+npm test
 
-### Estructura de un Formulario
+# Construir para producción
+cd client
+npm run build
+
+# Verificar tipos TypeScript
+cd client
+npx tsc --noEmit
+```
+
+### Estructura de Datos
+
+#### Formulario
 ```json
 {
-  "id": 1234567890,
-  "title": "Encuesta de Satisfacción",
-  "description": "Ayúdanos a mejorar",
+  "id": 1,
+  "title": "Título del formulario",
+  "description": "Descripción opcional",
   "questions": [
     {
-      "id": 1234567891,
-      "question_text": "¿Cómo calificarías nuestro servicio?",
+      "id": 1,
+      "question_text": "Texto de la pregunta",
       "question_type": "radio",
-      "options": ["Excelente", "Bueno", "Regular", "Malo"],
+      "options": ["Opción 1", "Opción 2"],
       "required": true,
-      "order_index": 0
+      "skip_logic": {
+        "enabled": true,
+        "conditions": [
+          {
+            "option": "Opción 1",
+            "skip_to_question": 3
+          }
+        ]
+      }
     }
-  ],
-  "created_at": "2024-01-01T12:00:00.000Z"
+  ]
 }
 ```
 
-### Estructura de una Respuesta
+#### Respuesta
 ```json
 {
-  "id": 1234567892,
-  "form_id": 1234567890,
+  "id": 1,
+  "form_id": 1,
   "respondent_name": "Juan Pérez",
   "answers": [
     {
-      "question_id": 1234567891,
-      "answer_text": "Excelente"
+      "question_id": 1,
+      "answer_text": "Opción 1"
     }
   ],
-  "submitted_at": "2024-01-01T13:00:00.000Z"
+  "submitted_at": "2024-01-15T10:30:00.000Z"
 }
 ```
 
-## 🔧 Scripts Disponibles
+## Uso de la Aplicación
 
-- `npm start` - Inicia el servidor en modo producción
-- `npm run dev` - Inicia el servidor en modo desarrollo con nodemon
-- `npm run build` - Construye el frontend para producción
-- `npm run install-client` - Instala dependencias del frontend
+### 1. Crear Formularios
+- Acceder a `/form-builder`
+- Configurar preguntas y lógica condicional
+- Guardar formulario
 
-## 📱 Características Responsive
+### 2. Responder Formularios
+- Acceder a `/form/:id`
+- Las preguntas se ocultan/muestran automáticamente
+- Enviar respuestas
 
-La aplicación está optimizada para:
-- **Desktop**: Pantallas grandes con layout completo
-- **Tablet**: Adaptación de elementos para pantallas medianas
-- **Mobile**: Navegación y formularios optimizados para móviles
+### 3. Gestionar Respuestas
+- Acceder a `/form/:id/responses`
+- Ver todas las respuestas
+- Exportar a Excel con un clic
 
-## 🎨 Personalización
+### 4. Exportar Datos
+- En la página de respuestas
+- Hacer clic en "Exportar a Excel"
+- Descargar archivo .xlsx
+- Abrir en Excel para análisis
 
-### Colores
-Los colores principales se pueden modificar en los archivos CSS:
-- Gradiente principal: `#667eea` a `#764ba2`
-- Colores de estado: `#28a745` (éxito), `#dc3545` (error)
-
-### Estilos
-Todos los estilos están en archivos CSS separados por componente para fácil personalización.
-
-## 🔒 Seguridad
-
-- Validación de datos en frontend y backend
-- Sanitización de inputs
-- Autenticación JWT para operaciones sensibles
-- Confirmación de usuario para acciones destructivas
-
-## 🔌 API Endpoints
-
-### Autenticación
-- `POST /api/auth/register` - Registrar nuevo usuario
-- `POST /api/auth/login` - Iniciar sesión
-- `GET /api/auth/me` - Obtener información del usuario actual
-
-### Formularios
-- `GET /api/forms` - Obtener todos los formularios
-- `POST /api/forms` - Crear nuevo formulario (requiere autenticación)
-- `GET /api/forms/:id` - Obtener formulario específico
-- `DELETE /api/forms/:id` - Eliminar formulario y sus respuestas (requiere autenticación)
-
-### Respuestas
-- `POST /api/forms/:id/responses` - Enviar respuesta a un formulario
-- `GET /api/forms/:id/responses` - Obtener respuestas de un formulario (requiere autenticación)
-- Almacenamiento local en archivos JSON
-- 🔐 **Sistema de Autenticación**: Login y registro de usuarios
-- **Contraseñas hasheadas con bcrypt**
-- **Tokens JWT para autenticación**
-- **Rutas protegidas en el frontend y backend**
-- **Validación de datos en cliente y servidor**
-
-## 🚧 Limitaciones Actuales
-
-- No hay autenticación de usuarios
-- Los formularios son públicos (cualquiera con el enlace puede responder)
-- No hay límite en el número de respuestas
-- No hay exportación de datos
-- Almacenamiento local (no persistente en servidor remoto)
-
-## 🔮 Próximas Mejoras
-
-- [ ] Migración a SQLite para mejor rendimiento
-- [ ] Sistema de autenticación
-- [ ] Formularios privados con contraseña
-- [ ] Exportación a Excel/CSV
-- [ ] Plantillas de formularios
-- [ ] Notificaciones por email
-- [ ] Límites de respuestas
-- [ ] Editor de formularios más avanzado
-
-## 🤝 Contribuir
+## Contribuir
 
 1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
 3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
 4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+5. Abrir un Pull Request
 
-## 📄 Licencia
+## Licencia
 
-Este proyecto está bajo la Licencia ISC.
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
-## 📞 Soporte
+## Soporte
 
-Si tienes problemas o preguntas, puedes:
-- Abrir un issue en el repositorio
-- Contactar al desarrollador
+Para reportar bugs o solicitar nuevas características, por favor abre un issue en el repositorio.
+
+---
+
+## Changelog
+
+### v2.0.0 - Funcionalidades Avanzadas
+- ✅ **Lógica condicional** - Mostrar/ocultar preguntas según respuestas
+- ✅ **Exportación a Excel** - Descargar respuestas en formato .xlsx
+- ✅ **Interfaz mejorada** - Diseño moderno y responsive
+- ✅ **Validación inteligente** - Solo valida preguntas visibles
+
+### v1.0.0 - Funcionalidades Básicas
+- ✅ Creación de formularios
+- ✅ Autenticación de usuarios
+- ✅ Gestión de respuestas
+- ✅ Interfaz básica
 
 ---

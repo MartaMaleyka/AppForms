@@ -11,6 +11,7 @@ Una aplicación web completa para crear y gestionar formularios con lógica cond
 - **Autenticación de usuarios** con JWT
 - **Gestión de respuestas** y visualización de resultados
 - **Interfaz moderna** y responsive
+- **Base de datos MySQL** para almacenamiento persistente
 
 ### 🎯 Lógica Condicional (Skip Logic)
 - **Mostrar/ocultar preguntas** según las respuestas del usuario
@@ -79,30 +80,53 @@ Resultado: Las preguntas 2, 3, 4 se ocultan automáticamente
 
 ### Prerrequisitos
 - Node.js (v14 o superior)
+- MySQL Server (v8.0 o superior)
 - npm o yarn
 
-### Instalación
+### Configuración de Base de Datos
 
-1. **Clonar el repositorio**
+#### Opción 1: Configuración Automática (Recomendado)
+
 ```bash
-git clone <repository-url>
-cd Forms
+# Ejecutar configuración completa
+setup_complete.bat
 ```
 
-2. **Instalar dependencias**
-```bash
-npm install
-cd client
-npm install
-```
+#### Opción 2: Configuración Manual
+
+1. **Configurar MySQL**
+   ```bash
+   # Ejecutar script de configuración de base de datos
+   setup_database.bat
+   ```
+
+2. **Migrar datos existentes (opcional)**
+   ```bash
+   # Migrar datos desde archivos JSON
+   node migrate_from_json.js
+   ```
+
+### Instalación de Dependencias
+
+1. **Instalar dependencias del servidor**
+   ```bash
+   npm install
+   ```
+
+2. **Instalar dependencias del cliente**
+   ```bash
+   cd client
+   npm install
+   ```
 
 3. **Configurar variables de entorno**
-```bash
-# En el directorio raíz, crear .env
-JWT_SECRET=tu-clave-secreta-aqui
-```
+   ```bash
+   # En el directorio raíz, crear .env
+   JWT_SECRET=tu-clave-secreta-aqui
+   ```
 
-4. **Iniciar la aplicación**
+### Iniciar la Aplicación
+
 ```bash
 # Terminal 1 - Servidor backend
 npm start
@@ -128,11 +152,15 @@ Forms/
 │   │   │   ├── FormResponses.tsx  # Gestión de respuestas
 │   │   │   └── ...
 │   │   └── contexts/      # Contextos de React
-├── data/                  # Archivos de datos JSON
-│   ├── forms.json         # Formularios guardados
-│   ├── responses.json     # Respuestas de usuarios
-│   └── users.json         # Usuarios del sistema
-└── server.js              # Servidor Express
+├── config/                # Configuración de base de datos
+│   └── database.js        # Configuración MySQL
+├── models/                # Modelos de datos
+│   ├── User.js           # Modelo de usuarios
+│   ├── Form.js           # Modelo de formularios
+│   └── Response.js       # Modelo de respuestas
+├── data/                  # Archivos de datos JSON (migración)
+├── server.js              # Servidor Express
+└── database_setup.sql     # Script de configuración MySQL
 ```
 
 ## API Endpoints
@@ -152,6 +180,29 @@ Forms/
 - `POST /api/forms/:id/responses` - Enviar respuesta
 - `GET /api/forms/:id/responses` - Ver respuestas (requiere auth)
 - `GET /api/forms/:id/responses/export` - Exportar respuestas a Excel
+
+## Base de Datos MySQL
+
+### Configuración
+- **Host**: localhost
+- **Puerto**: 3306
+- **Usuario**: root
+- **Contraseña**: labebe12
+- **Base de datos**: forms_db
+
+### Tablas Principales
+- **users** - Usuarios del sistema
+- **forms** - Formularios creados
+- **questions** - Preguntas de cada formulario
+- **question_options** - Opciones para preguntas
+- **skip_logic** - Configuración de lógica condicional
+- **skip_logic_conditions** - Condiciones específicas
+- **form_responses** - Respuestas completas
+- **answers** - Respuestas individuales
+
+### Credenciales por Defecto
+- **Usuario admin**: `admin`
+- **Contraseña**: `password`
 
 ## Ejemplo de Formulario con Lógica Condicional
 
@@ -174,11 +225,18 @@ El sistema incluye un formulario de ejemplo que demuestra la funcionalidad:
 
 ### Backend
 - **Node.js** con Express
+- **MySQL** para almacenamiento persistente
 - **JWT** para autenticación
-- **Almacenamiento JSON** (sin base de datos)
 - **CORS** habilitado
 - **Validación de datos** completa
 - **ExcelJS** para generación de archivos Excel
+
+### Base de Datos
+- **MySQL 8.0+** para almacenamiento
+- **Transacciones** para integridad de datos
+- **Índices optimizados** para rendimiento
+- **Claves foráneas** para relaciones
+- **Soporte Unicode** completo
 
 ### Lógica Condicional
 - **Evaluación en tiempo real** de condiciones
@@ -207,6 +265,12 @@ npm run build
 # Verificar tipos TypeScript
 cd client
 npx tsc --noEmit
+
+# Migrar datos desde JSON
+node migrate_from_json.js
+
+# Configurar base de datos
+setup_database.bat
 ```
 
 ### Estructura de Datos
@@ -277,6 +341,23 @@ npx tsc --noEmit
 - Descargar archivo .xlsx
 - Abrir en Excel para análisis
 
+## Solución de Problemas
+
+### Error de Conexión a MySQL
+1. Verificar que MySQL esté ejecutándose
+2. Verificar credenciales en `config/database.js`
+3. Ejecutar `setup_database.bat` para configurar la base de datos
+
+### Error de Migración
+1. Verificar que los archivos JSON existan en `data/`
+2. Ejecutar `node migrate_from_json.js` manualmente
+3. Verificar logs para errores específicos
+
+### Error de Autenticación
+1. Verificar que el usuario admin exista en la base de datos
+2. Usar credenciales por defecto: admin/password
+3. Verificar configuración JWT_SECRET
+
 ## Contribuir
 
 1. Fork el proyecto
@@ -287,11 +368,17 @@ npx tsc --noEmit
 
 ## Licencia
 
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+Este proyecto está bajo la Licencia ISC. Ver el archivo `LICENSE` para más detalles.
 
 ## Soporte
 
-Para reportar bugs o solicitar nuevas características, por favor abre un issue en el repositorio.
+Si encuentras problemas:
+
+1. Verifica que MySQL esté ejecutándose
+2. Verifica la configuración de la base de datos
+3. Revisa los logs del servidor
+4. Ejecuta los scripts de configuración
+5. Consulta la documentación de MySQL
 
 ---
 

@@ -1,9 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs').promises;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
+// Importar configuración de base de datos y modelos
+const { testConnection } = require('./config/database');
+const User = require('./models/User');
+const Form = require('./models/Form');
+const Response = require('./models/Response');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -12,124 +17,20 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'client/build')));
 
-// Data files
-const FORMS_FILE = './data/forms.json';
-const RESPONSES_FILE = './data/responses.json';
-const USERS_FILE = './data/users.json';
-
-// Ensure data directory exists
-async function ensureDataDirectory() {
-  try {
-    await fs.mkdir('./data', { recursive: true });
-  } catch (error) {
-    console.log('Data directory already exists');
-  }
-}
-
-// Initialize data files if they don't exist
-async function initializeDataFiles() {
-  try {
-    await fs.access(FORMS_FILE);
-  } catch {
-    await fs.writeFile(FORMS_FILE, JSON.stringify([], null, 2));
-  }
-  
-  try {
-    await fs.access(RESPONSES_FILE);
-  } catch {
-    await fs.writeFile(RESPONSES_FILE, JSON.stringify([], null, 2));
-  }
-
-  try {
-    await fs.access(USERS_FILE);
-  } catch {
-    // Create default admin user
-    const defaultUsers = [{
-      id: 1,
-      username: 'admin',
-      email: 'admin@example.com',
-      password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-      role: 'admin',
-      created_at: new Date().toISOString()
-    }];
-    await fs.writeFile(USERS_FILE, JSON.stringify(defaultUsers, null, 2));
-  }
-}
-
-// Read data from JSON files
-async function readForms() {
-  try {
-    const data = await fs.readFile(FORMS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
-}
-
-async function readResponses() {
-  try {
-    const data = await fs.readFile(RESPONSES_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
-}
-
-// Read users from JSON file
-async function readUsers() {
-  try {
-    const data = await fs.readFile(USERS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
-}
-
-// Write data to JSON files
-async function writeForms(forms) {
-  await fs.writeFile(FORMS_FILE, JSON.stringify(forms, null, 2));
-}
-
-async function writeResponses(responses) {
-  await fs.writeFile(RESPONSES_FILE, JSON.stringify(responses, null, 2));
-}
-
-// Write users to JSON file
-async function writeUsers(users) {
-  await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
-}
-
-// Initialize data
-async function initializeData() {
-  await ensureDataDirectory();
-  await initializeDataFiles();
-  console.log('Data files initialized successfully');
-}
-
-// Authentication middleware
+// Middleware de autenticación
 function authenticateToken(req, res, next) {
-  console.log('Authenticating request for:', req.method, req.path);
-  console.log('Headers:', req.headers);
-  
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  console.log('Auth header:', authHeader);
-  console.log('Token:', token);
-
   if (!token) {
-    console.log('No token provided');
     return res.status(401).json({ error: 'Access token required' });
   }
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      console.log('Token verification failed:', err.message);
       return res.status(403).json({ error: 'Invalid or expired token' });
     }
-    console.log('Token verified successfully, user:', user);
     req.user = user;
     next();
   });
@@ -141,10 +42,18 @@ function authenticateToken(req, res, next) {
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    const users = await readUsers();
     
-    // Check if user already exists
-    const existingUser = users.find(u => u.username === username || u.email === email);
+    // Validar datos de entrada
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+    
+    // Verificar si el usuario ya existe
+    const existingUser = await User.findByUsernameOrEmail(username);
     if (existingUser) {
       return res.status(400).json({ error: 'Username or email already exists' });
     }
@@ -152,17 +61,13 @@ app.post('/api/auth/register', async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    const newUser = {
-      id: Date.now(),
+    // Crear usuario
+    const newUser = await User.create({
       username,
       email,
       password: hashedPassword,
-      role: 'user',
-      created_at: new Date().toISOString()
-    };
-    
-    users.push(newUser);
-    await writeUsers(users);
+      role: 'user'
+    });
     
     // Generate JWT token
     const token = jwt.sign(
@@ -190,10 +95,13 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const users = await readUsers();
+    
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
     
     // Find user by username or email
-    const user = users.find(u => u.username === username || u.email === username);
+    const user = await User.findByUsernameOrEmail(username);
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -229,9 +137,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/auth/me', authenticateToken, async (req, res) => {
   try {
-    const users = await readUsers();
-    const user = users.find(u => u.id === req.user.id);
-    
+    const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -255,26 +161,16 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
 app.post('/api/forms', authenticateToken, async (req, res) => {
   try {
     const { title, description, questions } = req.body;
-    const forms = await readForms();
     
-    const newForm = {
-      id: Date.now(),
+    if (!title || !questions || questions.length === 0) {
+      return res.status(400).json({ error: 'Title and at least one question are required' });
+    }
+    
+    const newForm = await Form.create({
       title,
-      description,
-      questions: questions.map((q, index) => ({
-        id: Date.now() + index + 1,
-        question_text: q.question_text,
-        question_type: q.question_type,
-        options: q.options || [],
-        required: q.required,
-        skip_logic: q.skip_logic || { enabled: false, conditions: [] },
-        order_index: index
-      })),
-      created_at: new Date().toISOString()
-    };
-    
-    forms.push(newForm);
-    await writeForms(forms);
+      description: description || '',
+      questions
+    }, req.user.id);
     
     res.json({ id: newForm.id, message: 'Form created successfully' });
   } catch (error) {
@@ -286,8 +182,8 @@ app.post('/api/forms', authenticateToken, async (req, res) => {
 // Get all forms
 app.get('/api/forms', async (req, res) => {
   try {
-    const forms = await readForms();
-    res.json(forms.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
+    const forms = await Form.findAll();
+    res.json(forms);
   } catch (error) {
     console.error('Error reading forms:', error);
     res.status(500).json({ error: 'Error reading forms' });
@@ -298,8 +194,7 @@ app.get('/api/forms', async (req, res) => {
 app.get('/api/forms/:id', async (req, res) => {
   try {
     const formId = parseInt(req.params.id);
-    const forms = await readForms();
-    const form = forms.find(f => f.id === formId);
+    const form = await Form.findById(formId);
     
     if (!form) {
       return res.status(404).json({ error: 'Form not found' });
@@ -317,21 +212,22 @@ app.post('/api/forms/:id/responses', async (req, res) => {
   try {
     const formId = parseInt(req.params.id);
     const { respondent_name, answers } = req.body;
-    const responses = await readResponses();
     
-    const newResponse = {
-      id: Date.now(),
+    if (!respondent_name || !answers || answers.length === 0) {
+      return res.status(400).json({ error: 'Respondent name and answers are required' });
+    }
+    
+    // Verificar que el formulario existe
+    const form = await Form.findById(formId);
+    if (!form) {
+      return res.status(404).json({ error: 'Form not found' });
+    }
+    
+    const newResponse = await Response.create({
       form_id: formId,
       respondent_name,
-      answers: answers.map(a => ({
-        question_id: a.question_id,
-        answer_text: a.answer_text
-      })),
-      submitted_at: new Date().toISOString()
-    };
-    
-    responses.push(newResponse);
-    await writeResponses(responses);
+      answers
+    });
     
     res.json({ message: 'Response submitted successfully' });
   } catch (error) {
@@ -344,32 +240,15 @@ app.post('/api/forms/:id/responses', async (req, res) => {
 app.get('/api/forms/:id/responses', authenticateToken, async (req, res) => {
   try {
     const formId = parseInt(req.params.id);
-    const responses = await readResponses();
-    const forms = await readForms();
     
-    const form = forms.find(f => f.id === formId);
+    // Verificar que el formulario existe
+    const form = await Form.findById(formId);
     if (!form) {
       return res.status(404).json({ error: 'Form not found' });
     }
     
-    const formResponses = responses
-      .filter(r => r.form_id === formId)
-      .map(response => ({
-        id: response.id,
-        respondent_name: response.respondent_name,
-        submitted_at: response.submitted_at,
-        answers: response.answers.map(answer => {
-          const question = form.questions.find(q => q.id === answer.question_id);
-          return {
-            question_id: answer.question_id,
-            question_text: question ? question.question_text : 'Unknown Question',
-            question_type: question ? question.question_type : 'text',
-            answer_text: answer.answer_text
-          };
-        })
-      }));
-    
-    res.json(formResponses);
+    const responses = await Response.findByFormId(formId);
+    res.json(responses);
   } catch (error) {
     console.error('Error reading responses:', error);
     res.status(500).json({ error: 'Error reading responses' });
@@ -379,37 +258,89 @@ app.get('/api/forms/:id/responses', authenticateToken, async (req, res) => {
 // Delete a form
 app.delete('/api/forms/:id', authenticateToken, async (req, res) => {
   try {
-    console.log('Delete request received for form ID:', req.params.id);
-    console.log('User:', req.user);
-    
     const formId = parseInt(req.params.id);
-    const forms = await readForms();
-    const responses = await readResponses();
     
-    console.log('Total forms:', forms.length);
-    console.log('Form IDs:', forms.map(f => f.id));
-    
-    const formIndex = forms.findIndex(f => f.id === formId);
-    console.log('Form index:', formIndex);
-    
-    if (formIndex === -1) {
-      console.log('Form not found');
+    // Verificar que el formulario existe
+    const form = await Form.findById(formId);
+    if (!form) {
       return res.status(404).json({ error: 'Form not found' });
     }
     
-    // Remove the form
-    forms.splice(formIndex, 1);
-    await writeForms(forms);
+    // Eliminar formulario (las respuestas se eliminan automáticamente por CASCADE)
+    const deleted = await Form.delete(formId);
     
-    // Remove all responses for this form
-    const filteredResponses = responses.filter(r => r.form_id !== formId);
-    await writeResponses(filteredResponses);
-    
-    console.log('Form deleted successfully');
-    res.json({ message: 'Form deleted successfully' });
+    if (deleted) {
+      res.json({ message: 'Form deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'Form not found' });
+    }
   } catch (error) {
     console.error('Error deleting form:', error);
     res.status(500).json({ error: 'Error deleting form' });
+  }
+});
+
+// Export form responses to Excel
+app.get('/api/forms/:id/responses/export', authenticateToken, async (req, res) => {
+  try {
+    const ExcelJS = require('exceljs');
+    const formId = parseInt(req.params.id);
+    
+    // Verificar que el formulario existe
+    const form = await Form.findById(formId);
+    if (!form) {
+      return res.status(404).json({ error: 'Form not found' });
+    }
+    
+    const responses = await Response.findByFormId(formId);
+    
+    // Create workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Responses');
+    
+    // Define columns
+    const columns = [
+      { header: 'Respondent', key: 'respondent_name', width: 20 },
+      { header: 'Date Submitted', key: 'submitted_at', width: 20 }
+    ];
+    
+    // Add question columns
+    form.questions.forEach((question, index) => {
+      columns.push({
+        header: `Q${index + 1}: ${question.question_text}`,
+        key: `question_${question.id}`,
+        width: 30
+      });
+    });
+    
+    worksheet.columns = columns;
+    
+    // Add data rows
+    responses.forEach(response => {
+      const row = {
+        respondent_name: response.respondent_name,
+        submitted_at: new Date(response.submitted_at).toLocaleString()
+      };
+      
+      // Add answers to row
+      response.answers.forEach(answer => {
+        row[`question_${answer.question_id}`] = answer.answer_text;
+      });
+      
+      worksheet.addRow(row);
+    });
+    
+    // Set response headers
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="form_${formId}_responses.xlsx"`);
+    
+    // Write to response
+    await workbook.xlsx.write(res);
+    res.end();
+    
+  } catch (error) {
+    console.error('Error exporting responses:', error);
+    res.status(500).json({ error: 'Error exporting responses' });
   }
 });
 
@@ -424,12 +355,25 @@ app.get('*', (req, res) => {
 
 // Initialize and start server
 async function startServer() {
-  await initializeData();
-  
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Data files: ${FORMS_FILE}, ${RESPONSES_FILE}`);
-  });
+  try {
+    // Test database connection
+    const dbConnected = await testConnection();
+    if (!dbConnected) {
+      console.error('❌ No se pudo conectar a la base de datos MySQL');
+      console.error('Por favor, ejecuta el script de configuración de la base de datos');
+      process.exit(1);
+    }
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
+      console.log(`📊 Base de datos MySQL conectada correctamente`);
+      console.log(`🌐 Frontend: http://localhost:3000`);
+      console.log(`🔧 API: http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Error starting server:', error);
+    process.exit(1);
+  }
 }
 
 startServer().catch(console.error); 

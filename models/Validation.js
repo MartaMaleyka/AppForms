@@ -49,6 +49,24 @@ class Validation {
     }
   }
 
+  // Obtener validaciones de un usuario específico
+  static async findByUser(userId) {
+    const sql = `
+      SELECT cv.*, q.question_text, q.question_type, f.title as form_title
+      FROM custom_validations cv
+      JOIN questions q ON cv.question_id = q.id
+      JOIN forms f ON q.form_id = f.id
+      WHERE f.created_by = ?
+      ORDER BY cv.question_id, cv.id
+    `;
+    
+    try {
+      return await query(sql, [userId]);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Actualizar una validación
   static async update(id, validationData) {
     const { validation_type, validation_rule, error_message } = validationData;

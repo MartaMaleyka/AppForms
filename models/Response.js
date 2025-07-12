@@ -172,6 +172,24 @@ class Response {
     }
   }
 
+  // Obtener respuestas recientes de un usuario
+  static async findRecentByUser(userId, limit = 10) {
+    const sql = `
+      SELECT fr.id, fr.respondent_name, fr.submitted_at, f.title as form_title
+      FROM form_responses fr
+      JOIN forms f ON fr.form_id = f.id
+      WHERE f.created_by = ?
+      ORDER BY fr.submitted_at DESC
+      LIMIT ?
+    `;
+    
+    try {
+      return await query(sql, [userId, limit]);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Obtener respuestas con paginación
   static async findByFormIdPaginated(formId, page = 1, limit = 10) {
     const offset = (page - 1) * limit;

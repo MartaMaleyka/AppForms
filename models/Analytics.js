@@ -137,6 +137,32 @@ class Analytics {
     }
   }
 
+  // Obtener estadísticas de un usuario específico
+  static async getUserStats(userId, days = 30) {
+    const sql = `
+      SELECT 
+        (SELECT COUNT(*) FROM forms WHERE created_by = ?) as total_forms,
+        (SELECT COUNT(*) FROM form_responses fr 
+         JOIN forms f ON fr.form_id = f.id 
+         WHERE f.created_by = ?) as total_responses,
+        (SELECT COUNT(*) FROM forms 
+         WHERE created_by = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) as forms_this_week,
+        (SELECT COUNT(*) FROM form_responses fr 
+         JOIN forms f ON fr.form_id = f.id 
+         WHERE f.created_by = ? AND fr.submitted_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) as responses_this_week,
+        (SELECT COUNT(*) FROM form_responses fr 
+         JOIN forms f ON fr.form_id = f.id 
+         WHERE f.created_by = ? AND fr.submitted_at >= DATE_SUB(NOW(), INTERVAL ? DAY)) as responses_period
+    `;
+    
+    try {
+      const result = await query(sql, [userId, userId, userId, userId, userId, days]);
+      return result[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Obtener formularios más populares
   static async getPopularForms(limit = 10) {
     const sql = `

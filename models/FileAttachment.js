@@ -134,6 +134,47 @@ class FileAttachment {
     }
   }
 
+  // Obtener archivos adjuntos de un usuario específico
+  static async findByUser(userId) {
+    const sql = `
+      SELECT fa.*, q.question_text, q.question_type, f.title as form_title
+      FROM file_attachments fa
+      JOIN questions q ON fa.question_id = q.id
+      JOIN forms f ON q.form_id = f.id
+      WHERE f.created_by = ?
+      ORDER BY fa.uploaded_at DESC
+    `;
+    
+    try {
+      return await query(sql, [userId]);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Obtener estadísticas de archivos de un usuario
+  static async getUserStats(userId) {
+    const sql = `
+      SELECT 
+        COUNT(*) as total_files,
+        SUM(fa.file_size) as total_size,
+        AVG(fa.file_size) as avg_size,
+        COUNT(DISTINCT fa.response_id) as responses_with_files,
+        COUNT(DISTINCT fa.question_id) as questions_with_files
+      FROM file_attachments fa
+      JOIN questions q ON fa.question_id = q.id
+      JOIN forms f ON q.form_id = f.id
+      WHERE f.created_by = ?
+    `;
+    
+    try {
+      const result = await query(sql, [userId]);
+      return result[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Obtener tipos de archivo más comunes
   static async getTopFileTypes(limit = 10) {
     const sql = `

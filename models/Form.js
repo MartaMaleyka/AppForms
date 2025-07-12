@@ -110,6 +110,24 @@ class Form {
     }
   }
 
+  // Obtener formularios de un usuario específico
+  static async findByUser(userId) {
+    const sql = `
+      SELECT f.id, f.title, f.description, f.created_at, f.updated_at,
+             u.username as created_by_username
+      FROM forms f
+      LEFT JOIN users u ON f.created_by = u.id
+      WHERE f.created_by = ?
+      ORDER BY f.created_at DESC
+    `;
+    
+    try {
+      return await query(sql, [userId]);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Obtener un formulario específico con preguntas
   static async findById(id) {
     const connection = await getConnection();
@@ -117,7 +135,7 @@ class Form {
     try {
       // Obtener formulario
       const formSql = `
-        SELECT f.id, f.title, f.description, f.created_at, f.updated_at,
+        SELECT f.id, f.title, f.description, f.created_at, f.updated_at, f.created_by,
                u.username as created_by_username
         FROM forms f
         LEFT JOIN users u ON f.created_by = u.id

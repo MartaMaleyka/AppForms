@@ -9,6 +9,11 @@ const { testConnection } = require('./config/database');
 const User = require('./models/User');
 const Form = require('./models/Form');
 const Response = require('./models/Response');
+const Analytics = require('./models/Analytics'); // Added Analytics model
+const AuditLog = require('./models/AuditLog'); // Added AuditLog model
+const FileAttachment = require('./models/FileAttachment'); // Added FileAttachment model
+const FormTemplate = require('./models/FormTemplate'); // Added FormTemplate model
+const Validation = require('./models/Validation'); // Added Validation model
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -180,9 +185,9 @@ app.post('/api/forms', authenticateToken, async (req, res) => {
 });
 
 // Get all forms
-app.get('/api/forms', async (req, res) => {
+app.get('/api/forms', authenticateToken, async (req, res) => {
   try {
-    const forms = await Form.findAll();
+    const forms = await Form.findByUser(req.user.id);
     res.json(forms);
   } catch (error) {
     console.error('Error reading forms:', error);
@@ -241,10 +246,15 @@ app.get('/api/forms/:id/responses', authenticateToken, async (req, res) => {
   try {
     const formId = parseInt(req.params.id);
     
-    // Verificar que el formulario existe
+    // Verificar que el formulario existe y pertenece al usuario
     const form = await Form.findById(formId);
     if (!form) {
       return res.status(404).json({ error: 'Form not found' });
+    }
+    
+    // Verificar que el formulario pertenece al usuario autenticado
+    if (form.created_by !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
     }
     
     const responses = await Response.findByFormId(formId);
@@ -260,10 +270,15 @@ app.delete('/api/forms/:id', authenticateToken, async (req, res) => {
   try {
     const formId = parseInt(req.params.id);
     
-    // Verificar que el formulario existe
+    // Verificar que el formulario existe y pertenece al usuario
     const form = await Form.findById(formId);
     if (!form) {
       return res.status(404).json({ error: 'Form not found' });
+    }
+    
+    // Verificar que el formulario pertenece al usuario autenticado
+    if (form.created_by !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
     }
     
     // Eliminar formulario (las respuestas se eliminan automáticamente por CASCADE)
@@ -286,10 +301,15 @@ app.get('/api/forms/:id/responses/export', authenticateToken, async (req, res) =
     const ExcelJS = require('exceljs');
     const formId = parseInt(req.params.id);
     
-    // Verificar que el formulario existe
+    // Verificar que el formulario existe y pertenece al usuario
     const form = await Form.findById(formId);
     if (!form) {
       return res.status(404).json({ error: 'Form not found' });
+    }
+    
+    // Verificar que el formulario pertenece al usuario autenticado
+    if (form.created_by !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
     }
     
     const responses = await Response.findByFormId(formId);
@@ -341,6 +361,136 @@ app.get('/api/forms/:id/responses/export', authenticateToken, async (req, res) =
   } catch (error) {
     console.error('Error exporting responses:', error);
     res.status(500).json({ error: 'Error exporting responses' });
+  }
+});
+
+// Analytics endpoints - filtrados por usuario
+app.get('/api/analytics/dashboard', authenticateToken, async (req, res) => {
+  try {
+    const { form_id, date_range } = req.query;
+    const userId = req.user.id;
+    
+    let analyticsData;
+    let recentResponses = [];
+    
+    if (form_id && form_id !== 'all') {
+      // Verificar que el formulario pertenece al usuario
+      const form = await Form.findById(parseInt(form_id));
+      if (!form || form.created_by !== userId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      analyticsData = await Analytics.getFormStats(parseInt(form_id), parseInt(date_range) || 30);
+      recentResponses = await Response.findByFormId(parseInt(form_id));
+    } else {
+      // Obtener analytics de todos los formularios del usuario
+      analyticsData = await Analytics.getUserStats(userId, parseInt(date_range) || 30);
+      recentResponses = await Response.findRecentByUser(userId, 10);
+    }
+    
+    res.json({
+      analytics: analyticsData,
+      recent_responses: recentResponses
+    });
+  } catch (error) {
+    console.error('Error fetching analytics:', error);
+    res.status(500).json({ error: 'Error fetching analytics' });
+  }
+});
+
+app.get('/api/analytics/forms', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const forms = await Form.findByUser(userId);
+    
+    const analyticsPromises = forms.map(async (form) => {
+      const stats = await Analytics.getFormStats(form.id, 30);
+      return {
+        ...form,
+        stats: stats
+      };
+    });
+    
+    const formsWithStats = await Promise.all(analyticsPromises);
+    res.json(formsWithStats);
+  } catch (error) {
+    console.error('Error fetching forms analytics:', error);
+    res.status(500).json({ error: 'Error fetching forms analytics' });
+  }
+});
+
+// Audit logs filtrados por usuario
+app.get('/api/audit-logs', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { action_type, severity_level, date_from, date_to, page = 1, limit = 20 } = req.query;
+    
+    const filters = {
+      user_id: userId,
+      action: action_type !== 'all' ? action_type : null,
+      start_date: date_from || null,
+      end_date: date_to || null
+    };
+    
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const logs = await AuditLog.find(filters, parseInt(limit), offset);
+    const stats = await AuditLog.getStats(filters);
+    
+    res.json({
+      logs: logs,
+      stats: stats,
+      total_pages: Math.ceil(stats.total_logs / parseInt(limit))
+    });
+  } catch (error) {
+    console.error('Error fetching audit logs:', error);
+    res.status(500).json({ error: 'Error fetching audit logs' });
+  }
+});
+
+// File attachments filtrados por usuario
+app.get('/api/files', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const files = await FileAttachment.findByUser(userId);
+    res.json(files);
+  } catch (error) {
+    console.error('Error fetching files:', error);
+    res.status(500).json({ error: 'Error fetching files' });
+  }
+});
+
+app.get('/api/files/stats', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const stats = await FileAttachment.getUserStats(userId);
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching file stats:', error);
+    res.status(500).json({ error: 'Error fetching file stats' });
+  }
+});
+
+// Templates filtrados por usuario
+app.get('/api/templates', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const templates = await FormTemplate.findByUser(userId);
+    res.json(templates);
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    res.status(500).json({ error: 'Error fetching templates' });
+  }
+});
+
+// Validations filtradas por usuario
+app.get('/api/validations', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const validations = await Validation.findByUser(userId);
+    res.json(validations);
+  } catch (error) {
+    console.error('Error fetching validations:', error);
+    res.status(500).json({ error: 'Error fetching validations' });
   }
 });
 

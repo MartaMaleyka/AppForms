@@ -1,48 +1,71 @@
 
 
-# Sistema de Formularios Dinámicos Avanzado
+# 📋 Sistema de Formularios Dinámicos Avanzado
 
-Una aplicación web completa para crear y gestionar formularios con funcionalidades avanzadas, lógica condicional, plantillas, versionado, analytics, notificaciones y mucho más.
+> Una aplicación web completa para crear y gestionar formularios con funcionalidades avanzadas, lógica condicional, plantillas, versionado, analytics, notificaciones y mucho más.
+
+## 📑 Tabla de Contenidos
+
+- [🚀 Características Principales](#-características-principales)
+- [🎯 Funcionalidades Avanzadas](#-funcionalidades-avanzadas)
+- [⚡ Instalación Rápida](#-instalación-rápida)
+- [📖 Guía de Uso](#-guía-de-uso)
+- [🔧 Configuración](#-configuración)
+- [📊 API Reference](#-api-reference)
+- [🏗️ Arquitectura](#-arquitectura)
+- [🛠️ Desarrollo](#-desarrollo)
+- [❓ FAQ](#-faq)
+
+---
 
 ## 🚀 Características Principales
 
-### ✨ Funcionalidades Básicas
+### ✨ **Funcionalidades Básicas**
 - **Creación de formularios** con múltiples tipos de preguntas
 - **Autenticación de usuarios** con JWT y roles avanzados
 - **Gestión de respuestas** y visualización de resultados
 - **Interfaz moderna** y responsive con navegación mejorada
 - **Base de datos MySQL** para almacenamiento persistente
 
-### 🎯 Lógica Condicional (Skip Logic)
+### 🎯 **Lógica Condicional (Skip Logic)**
 - **Mostrar/ocultar preguntas** según las respuestas del usuario
 - **Saltos dinámicos** entre preguntas
 - **Múltiples condiciones** por pregunta
 - **Soporte para todos los tipos de preguntas** (radio, checkbox, select)
 
-### 📋 Nuevas Funcionalidades Avanzadas
+### ✅ **Validaciones Personalizadas**
+- **Validación en tiempo real** mientras el usuario escribe
+- **Múltiples tipos**: Regex, Longitud, Email, Teléfono, etc.
+- **Mensajes de error** personalizables
+- **Indicadores visuales** de errores y éxito
+- **Integración completa** con FormBuilder y FormView
 
-#### 🏗️ **Plantillas de Formularios**
+---
+
+## 🎯 Funcionalidades Avanzadas
+
+### 🏗️ **Plantillas de Formularios**
 - **Crear plantillas reutilizables** para formularios comunes
 - **Categorías de plantillas** (Encuestas, Registros, Evaluaciones, etc.)
 - **Plantillas públicas y privadas**
 - **Conversión de formularios existentes** a plantillas
 - **Búsqueda y filtrado** de plantillas
 
-#### 🔄 **Versionado de Formularios**
+### 🔄 **Versionado de Formularios**
 - **Múltiples versiones** de un mismo formulario
 - **Activación/desactivación** de versiones
 - **Comparación entre versiones** con diferencias visuales
 - **Historial completo** de cambios
 - **Migración de datos** entre versiones
 
-#### 🔐 **Sistema de Permisos y Roles Avanzado**
+### 🔐 **Sistema de Permisos y Roles Avanzado**
 - **Roles granulares**: Admin, Form Manager, Form Creator, Form Viewer
 - **Permisos específicos** por formulario
 - **Gestión de accesos** individual y por roles
 - **Permisos de exportación** y gestión de respuestas
 - **Auditoría de accesos** completa
 
-#### 🔔 **Sistema de Notificaciones**
+### 🔔 **Sistema de Notificaciones**
 - **Notificaciones en tiempo real** para nuevas respuestas
 - **Diferentes tipos**: Info, Success, Warning, Error
 - **Marcado de leídas/no leídas**
@@ -50,7 +73,7 @@ Una aplicación web completa para crear y gestionar formularios con funcionalida
 - **Badge de notificaciones** en navegación
 - **Notificaciones por email** (configurable)
 
-#### 📊 **Analytics y Reportes Avanzados**
+### 📊 **Analytics y Reportes Avanzados**
 - **Dashboard de métricas** en tiempo real
 - **Estadísticas por formulario**: vistas, respuestas, tasa de completitud
 - **Reportes personalizados** con filtros avanzados
@@ -58,7 +81,7 @@ Una aplicación web completa para crear y gestionar formularios con funcionalida
 - **Gráficos interactivos** de rendimiento
 - **Métricas de tiempo** de completitud
 
-#### 📁 **Gestión de Archivos Adjuntos**
+### 📁 **Gestión de Archivos Adjuntos**
 - **Subida de archivos** con drag & drop
 - **Múltiples formatos** soportados
 - **Vista previa** de archivos
@@ -66,110 +89,196 @@ Una aplicación web completa para crear y gestionar formularios con funcionalida
 - **Filtros por tipo** y fecha
 - **Estadísticas de uso** de archivos
 
-#### ✅ **Validaciones Personalizadas**
-- **Múltiples tipos de validación**: Regex, Longitud, Email, Teléfono, etc.
-- **Validación en tiempo real** en servidor y cliente
-- **Mensajes de error** personalizables
-- **Validaciones condicionales** según respuestas previas
-- **Testing de validaciones** antes de aplicar
-- **Integración completa** con FormBuilder y FormView
-- **Validación automática** mientras el usuario escribe
-- **Indicadores visuales** de errores y éxito
-
-#### 📋 **Logs de Auditoría**
+### 📋 **Logs de Auditoría**
 - **Registro completo** de todas las acciones
 - **Filtros avanzados** por usuario, acción, fecha
 - **Exportación de logs** para análisis
 - **Detalles de cambios** con valores anteriores y nuevos
 - **Información de IP** y User Agent
 
-#### ⚙️ **Configuración de Formularios**
-- **Configuración flexible** por formulario
-- **Almacenamiento JSON** para configuraciones complejas
-- **Configuraciones por defecto** y personalizadas
-- **Gestión de temas** y estilos
+---
 
-### 📊 Exportación de Datos Avanzada
-- **Exportar a Excel** (.xlsx) con formato profesional
-- **Incluir todas las respuestas** de los formularios
-- **Datos organizados** por pregunta y respondente
-- **Filtros y ordenamiento** de datos
-- **Exportación de analytics** y reportes
-- **Exportación de logs** de auditoría
+## ⚡ Instalación Rápida
 
-## 🎨 Tipos de Preguntas Soportados
+### 📋 Prerrequisitos
+- Node.js (v14 o superior)
+- MySQL Server (v8.0 o superior)
+- npm o yarn
 
-- **Texto corto** - Respuestas de una línea
-- **Texto largo** - Respuestas multilínea
-- **Opción única** - Radio buttons
-- **Múltiples opciones** - Checkboxes
-- **Lista desplegable** - Select dropdown
-- **Fecha** - Selector de fecha
-- **Hora** - Selector de hora
-- **Fecha y Hora** - Selector combinado
-- **Archivo** - Subida de archivos
-- **Rating** - Sistema de calificación
-- **Escala** - Escalas numéricas
+### 🚀 Instalación Automática (Recomendado)
 
-## 🏗️ Configuración de Lógica Condicional
+```bash
+# 1. Clonar el repositorio
+git clone <repository-url>
+cd Forms
 
-### Cómo Funciona
-1. **Activar skip logic** en cualquier pregunta
-2. **Configurar condiciones**: "Si el usuario selecciona X, entonces..."
-3. **Definir destino**: Ir a otra pregunta o finalizar formulario
-4. **Aplicación automática**: Las preguntas se ocultan/muestran dinámicamente
+# 2. Ejecutar configuración completa
+setup_complete.bat
 
-### Ejemplo de Uso
-```
-Pregunta 1: "¿Has usado nuestro servicio?"
-- Opciones: "Sí" / "No"
-
-Condición: Si selecciona "No" → Saltar a Pregunta 5
-Resultado: Las preguntas 2, 3, 4 se ocultan automáticamente
+# 3. Iniciar la aplicación
+npm start
 ```
 
-## 📋 Gestión de Plantillas
+### 🔧 Instalación Manual
 
-### Características
-- **Crear plantillas** desde formularios existentes
-- **Categorizar plantillas** para fácil búsqueda
-- **Plantillas públicas** para toda la organización
-- **Plantillas privadas** para uso personal
-- **Conversión rápida** de plantilla a formulario
+```bash
+# 1. Configurar base de datos
+setup_database.bat
 
-### Tipos de Plantillas Disponibles
-- **Encuestas de Satisfacción**
-- **Registros de Usuarios**
-- **Evaluaciones de Productos**
-- **Formularios de Contacto**
-- **Encuestas de Eventos**
-- **Evaluaciones de Servicios**
+# 2. Migrar funcionalidades avanzadas
+mysql -u root -plabebe12 forms_db < migrate_to_new_features.sql
 
-## 🔄 Sistema de Versionado
+# 3. Configurar validaciones
+setup_validations.bat
 
-### Funcionalidades
-- **Crear versiones** de formularios existentes
-- **Comparar versiones** lado a lado
-- **Activar/desactivar** versiones
-- **Migrar respuestas** entre versiones
-- **Historial de cambios** completo
+# 4. Instalar dependencias
+npm install
+cd client && npm install
 
-### Flujo de Trabajo
-1. **Crear nueva versión** desde formulario existente
-2. **Modificar preguntas** y lógica
-3. **Probar cambios** antes de activar
-4. **Activar versión** cuando esté lista
-5. **Migrar datos** si es necesario
+# 5. Configurar variables de entorno
+# Crear .env en el directorio raíz:
+JWT_SECRET=tu-clave-secreta-aqui
 
-## 🔐 Sistema de Permisos
+# 6. Iniciar aplicación
+npm start  # Backend
+cd client && npm start  # Frontend
+```
 
-### Roles Disponibles
+### 🌐 Acceso
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000
+- **Credenciales por defecto**: admin / password
+
+---
+
+## 📖 Guía de Uso
+
+### 🎯 **Flujo de Trabajo Principal**
+
+#### 1. **Crear Formularios** (`/create`)
+- Diseñar formularios con preguntas personalizadas
+- Configurar lógica condicional (skip logic)
+- Agregar validaciones por pregunta
+- Guardar y publicar formularios
+
+#### 2. **Gestionar Plantillas** (`/templates`)
+- Crear plantillas desde formularios existentes
+- Categorizar plantillas para fácil búsqueda
+- Usar plantillas para crear nuevos formularios
+
+#### 3. **Gestionar Versiones** (`/form/:formId/versions`)
+- Crear nuevas versiones de formularios
+- Comparar versiones lado a lado
+- Activar versiones cuando estén listas
+
+#### 4. **Responder Formularios** (`/form/:id`)
+- Las preguntas se ocultan/muestran automáticamente
+- Validación en tiempo real
+- Enviar respuestas con validación
+
+#### 5. **Gestionar Respuestas** (`/form/:id/responses`)
+- Ver todas las respuestas
+- Exportar a Excel con un clic
+- Filtrar y buscar respuestas
+
+#### 6. **Ver Analytics** (`/analytics`)
+- Dashboard de métricas en tiempo real
+- Crear reportes personalizados
+- Exportar analytics
+
+#### 7. **Gestionar Notificaciones** (`/notifications`)
+- Ver notificaciones no leídas
+- Marcar como leídas
+- Filtrar por tipo y fecha
+
+#### 8. **Configurar Validaciones** (`/validations`)
+- Crear validaciones globales reutilizables
+- Probar validaciones antes de usar
+- Gestionar biblioteca de validaciones
+
+#### 9. **Gestionar Archivos** (`/files`)
+- Subir archivos con drag & drop
+- Descargar archivos adjuntos
+- Ver estadísticas de uso
+
+#### 10. **Ver Logs de Auditoría** (`/audit-logs`)
+- Ver historial completo de acciones
+- Exportar logs para análisis
+- Filtrar por usuario y acción
+
+### 🎨 **Tipos de Preguntas Soportados**
+
+| Tipo | Descripción | Validaciones |
+|------|-------------|--------------|
+| **Texto corto** | Respuestas de una línea | Regex, Longitud, Personalizada |
+| **Texto largo** | Respuestas multilínea | Regex, Longitud, Personalizada |
+| **Email** | Dirección de correo electrónico | Email automático |
+| **Número** | Valores numéricos | Rango, Personalizada |
+| **Opción única** | Radio buttons | Skip logic |
+| **Múltiples opciones** | Checkboxes | Skip logic |
+| **Lista desplegable** | Select dropdown | Skip logic |
+| **Fecha** | Selector de fecha | Rango de fechas |
+| **Hora** | Selector de hora | Rango de horas |
+| **Fecha y Hora** | Selector combinado | Rango de fechas/horas |
+
+### ✅ **Tipos de Validación**
+
+| Tipo | Descripción | Ejemplo |
+|------|-------------|---------|
+| **Regex** | Expresión regular personalizada | `^[A-Za-z]+$` |
+| **Longitud** | Mínimo y máximo de caracteres | `{"min_length": 8, "max_length": 50}` |
+| **Rango** | Valores numéricos mínimo y máximo | `{"min_value": 18, "max_value": 65}` |
+| **Email** | Validación automática de formato | Automático |
+| **URL** | Validación automática de formato | Automático |
+| **Teléfono** | Validación de números telefónicos | Automático |
+| **Personalizada** | Función JavaScript personalizada | `return value.length > 0;` |
+
+---
+
+## 🔧 Configuración
+
+### 🗄️ **Base de Datos MySQL**
+
+#### Configuración
+```sql
+Host: localhost
+Puerto: 3306
+Usuario: root
+Contraseña: labebe12
+Base de datos: forms_db
+```
+
+#### Tablas Principales
+- **users** - Usuarios del sistema
+- **forms** - Formularios creados
+- **questions** - Preguntas de cada formulario
+- **question_options** - Opciones para preguntas
+- **skip_logic** - Configuración de lógica condicional
+- **skip_logic_conditions** - Condiciones específicas
+- **form_responses** - Respuestas completas
+- **answers** - Respuestas individuales
+
+#### Nuevas Tablas (v3.0)
+- **form_templates** - Plantillas de formularios
+- **form_versions** - Versiones de formularios
+- **permissions** - Permisos del sistema
+- **roles** - Roles de usuarios
+- **notifications** - Sistema de notificaciones
+- **file_attachments** - Archivos adjuntos
+- **audit_logs** - Logs de auditoría
+- **form_analytics** - Analytics y métricas
+- **custom_validations** - Validaciones personalizadas
+- **form_settings** - Configuración de formularios
+
+### 🔐 **Sistema de Permisos**
+
+#### Roles Disponibles
 - **Administrador**: Acceso completo al sistema
 - **Gestor de Formularios**: Crear, editar, ver respuestas
 - **Creador de Formularios**: Crear y editar formularios
 - **Visualizador**: Solo ver formularios y respuestas
 
-### Permisos Granulares
+#### Permisos Granulares
 - **form_create**: Crear formularios
 - **form_edit**: Editar formularios
 - **form_delete**: Eliminar formularios
@@ -179,208 +288,98 @@ Resultado: Las preguntas 2, 3, 4 se ocultan automáticamente
 - **user_manage**: Gestionar usuarios
 - **system_admin**: Administración del sistema
 
-## 🔔 Sistema de Notificaciones
+---
 
-### Tipos de Notificaciones
-- **Nueva respuesta** recibida
-- **Formulario compartido** contigo
-- **Versión activada** de formulario
-- **Reporte generado** automáticamente
-- **Error en validación** de formulario
+## 📊 API Reference
 
-### Características
-- **Badge de contador** en navegación
-- **Marcado de leídas** con un clic
-- **Filtros por tipo** y fecha
-- **Notificaciones persistentes** hasta leer
-- **Actualización automática** cada 30 segundos
-
-## 📊 Analytics y Reportes
-
-### Métricas Disponibles
-- **Total de vistas** por formulario
-- **Tasa de completitud** de formularios
-- **Tiempo promedio** de completitud
-- **Respuestas por día/semana/mes**
-- **Preguntas más respondidas**
-- **Tendencias temporales**
-
-### Reportes Personalizados
-- **Configurar filtros** avanzados
-- **Seleccionar métricas** específicas
-- **Programar reportes** automáticos
-- **Exportar a Excel/CSV**
-- **Compartir reportes** con otros usuarios
-
-## 📁 Gestión de Archivos
-
-### Características
-- **Subida drag & drop** de archivos
-- **Vista previa** de imágenes y documentos
-- **Descarga segura** con autenticación
-- **Filtros por tipo** de archivo
-- **Estadísticas de uso** y almacenamiento
-- **Límites de tamaño** configurables
-
-### Formatos Soportados
-- **Imágenes**: JPG, PNG, GIF, SVG
-- **Documentos**: PDF, DOC, DOCX, TXT
-- **Hojas de cálculo**: XLS, XLSX, CSV
-- **Presentaciones**: PPT, PPTX
-- **Archivos comprimidos**: ZIP, RAR
-
-## ✅ Validaciones Personalizadas
-
-### Tipos de Validación
-- **Regex**: Expresiones regulares personalizadas
-- **Longitud**: Mínimo y máximo de caracteres
-- **Valores**: Rango numérico
-- **Email**: Validación de formato de email
-- **Teléfono**: Validación de números telefónicos
-- **Personalizada**: Lógica de validación propia
-
-### Características
-- **Validación en tiempo real** en el cliente
-- **Validación en servidor** para seguridad
-- **Mensajes de error** personalizables
-- **Testing de validaciones** antes de aplicar
-- **Validaciones condicionales** según respuestas previas
-
-### Integración Completa
-
-#### 1. **ValidationBuilder** (`/validations`)
-- Crear validaciones globales reutilizables
-- Probar validaciones antes de usar
-- Gestionar biblioteca de validaciones
-
-#### 2. **FormBuilder** (`/create`)
-- Agregar validaciones específicas por pregunta
-- Configurar reglas de validación personalizadas
-- Validaciones integradas en el constructor de formularios
-
-#### 3. **FormView** (`/form/:id`)
-- Validación automática mientras el usuario escribe
-- Indicadores visuales de errores y éxito
-- Mensajes de error personalizados
-- Prevención de envío con datos inválidos
-
-### Ejemplos de Uso
-
-#### Validación de Email
-```javascript
-Tipo: "email"
-Mensaje: "Por favor ingresa un email válido"
+### 🔐 **Autenticación**
+```http
+POST /api/auth/register
+POST /api/auth/login
+GET /api/auth/me
 ```
 
-#### Validación de Longitud
-```javascript
-Tipo: "length"
-Regla: {"min_length": 8, "max_length": 50}
-Mensaje: "La contraseña debe tener entre 8 y 50 caracteres"
+### 📝 **Formularios**
+```http
+GET /api/forms
+POST /api/forms
+GET /api/forms/:id
+DELETE /api/forms/:id
 ```
 
-#### Validación Regex
-```javascript
-Tipo: "regex"
-Regla: "^[A-Za-z\\s]+$"
-Mensaje: "Solo se permiten letras y espacios"
+### 📋 **Respuestas**
+```http
+POST /api/forms/:id/responses
+GET /api/forms/:id/responses
+GET /api/forms/:id/responses/export
 ```
 
-## 📋 Logs de Auditoría
-
-### Información Registrada
-- **Usuario** que realizó la acción
-- **Tipo de acción** (crear, editar, eliminar, etc.)
-- **Tabla afectada** y registro específico
-- **Valores anteriores** y nuevos (JSON)
-- **IP address** y User Agent
-- **Timestamp** exacto de la acción
-
-### Filtros Disponibles
-- **Por usuario** específico
-- **Por tipo de acción**
-- **Por tabla afectada**
-- **Por rango de fechas**
-- **Por IP address**
-
-## Instalación y Configuración
-
-### Prerrequisitos
-- Node.js (v14 o superior)
-- MySQL Server (v8.0 o superior)
-- npm o yarn
-
-### Configuración de Base de Datos
-
-#### Opción 1: Configuración Automática (Recomendado)
-
-```bash
-# Ejecutar configuración completa
-setup_complete.bat
+### 📋 **Plantillas**
+```http
+GET /api/templates
+POST /api/templates
+GET /api/templates/:id
+PUT /api/templates/:id
+DELETE /api/templates/:id
+POST /api/templates/:id/use
 ```
 
-#### Opción 2: Configuración Manual
-
-1. **Configurar MySQL**
-   ```bash
-   # Ejecutar script de configuración de base de datos
-   setup_database.bat
-   ```
-
-2. **Ejecutar migración de nuevas funcionalidades**
-   ```bash
-   # Migrar a nuevas funcionalidades
-   mysql -u root -plabebe12 forms_db < migrate_to_new_features.sql
-   ```
-
-3. **Migrar datos existentes (opcional)**
-   ```bash
-   # Migrar datos desde archivos JSON
-   node migrate_from_json.js
-   ```
-
-4. **Configurar validaciones (nuevo)**
-   ```bash
-   # Ejecutar migración de validaciones
-   setup_validations.bat
-   ```
-
-### Instalación de Dependencias
-
-1. **Instalar dependencias del servidor**
-   ```bash
-   npm install
-   ```
-
-2. **Instalar dependencias del cliente**
-   ```bash
-   cd client
-   npm install
-   ```
-
-3. **Configurar variables de entorno**
-   ```bash
-   # En el directorio raíz, crear .env
-   JWT_SECRET=tu-clave-secreta-aqui
-   ```
-
-### Iniciar la Aplicación
-
-```bash
-# Terminal 1 - Servidor backend
-npm start
-
-# Terminal 2 - Cliente React
-cd client
-npm start
+### 🔄 **Versionado**
+```http
+GET /api/forms/:formId/versions
+POST /api/forms/:formId/versions
+PUT /api/forms/:formId/versions/:versionId/activate
+DELETE /api/forms/:formId/versions/:versionId
+GET /api/forms/:formId/versions/compare
 ```
 
-### Acceso
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
+### 🔔 **Notificaciones**
+```http
+GET /api/notifications
+PUT /api/notifications/:id/read
+DELETE /api/notifications/:id
+GET /api/notifications/unread-count
+```
 
-## Estructura del Proyecto
+### 📊 **Analytics**
+```http
+GET /api/analytics
+GET /api/analytics/form/:formId
+POST /api/analytics/export
+POST /api/analytics/reports
+```
 
+### 📋 **Auditoría**
+```http
+GET /api/audit-logs
+POST /api/audit-logs/export
+GET /api/audit-logs/stats
+```
+
+### ✅ **Validaciones**
+```http
+GET /api/validations
+POST /api/validations
+PUT /api/validations/:id
+DELETE /api/validations/:id
+POST /api/validations/:id/test
+POST /api/validations/validate
+```
+
+### 📁 **Archivos**
+```http
+GET /api/files
+POST /api/files/upload
+GET /api/files/:id/download
+DELETE /api/files/:id
+GET /api/files/stats
+```
+
+---
+
+## 🏗️ Arquitectura
+
+### 📁 **Estructura del Proyecto**
 ```
 Forms/
 ├── client/                 # Aplicación React
@@ -420,123 +419,9 @@ Forms/
 └── migrate_to_new_features.sql # Script de migración
 ```
 
-## API Endpoints
+### 🛠️ **Tecnologías Utilizadas**
 
-### Autenticación
-- `POST /api/auth/register` - Registro de usuarios
-- `POST /api/auth/login` - Inicio de sesión
-- `GET /api/auth/me` - Información del usuario actual
-
-### Formularios
-- `GET /api/forms` - Listar todos los formularios
-- `POST /api/forms` - Crear nuevo formulario
-- `GET /api/forms/:id` - Obtener formulario específico
-- `DELETE /api/forms/:id` - Eliminar formulario
-
-### Respuestas
-- `POST /api/forms/:id/responses` - Enviar respuesta
-- `GET /api/forms/:id/responses` - Ver respuestas (requiere auth)
-- `GET /api/forms/:id/responses/export` - Exportar respuestas a Excel
-
-### Plantillas
-- `GET /api/templates` - Listar plantillas
-- `POST /api/templates` - Crear plantilla
-- `GET /api/templates/:id` - Obtener plantilla
-- `PUT /api/templates/:id` - Actualizar plantilla
-- `DELETE /api/templates/:id` - Eliminar plantilla
-- `POST /api/templates/:id/use` - Usar plantilla para crear formulario
-
-### Versionado
-- `GET /api/forms/:formId/versions` - Listar versiones
-- `POST /api/forms/:formId/versions` - Crear nueva versión
-- `PUT /api/forms/:formId/versions/:versionId/activate` - Activar versión
-- `DELETE /api/forms/:formId/versions/:versionId` - Eliminar versión
-- `GET /api/forms/:formId/versions/compare` - Comparar versiones
-
-### Notificaciones
-- `GET /api/notifications` - Listar notificaciones
-- `PUT /api/notifications/:id/read` - Marcar como leída
-- `DELETE /api/notifications/:id` - Eliminar notificación
-- `GET /api/notifications/unread-count` - Contador de no leídas
-
-### Analytics
-- `GET /api/analytics` - Dashboard general
-- `GET /api/analytics/form/:formId` - Analytics por formulario
-- `POST /api/analytics/export` - Exportar analytics
-- `POST /api/analytics/reports` - Crear reporte personalizado
-
-### Auditoría
-- `GET /api/audit-logs` - Listar logs de auditoría
-- `POST /api/audit-logs/export` - Exportar logs
-- `GET /api/audit-logs/stats` - Estadísticas de auditoría
-
-### Validaciones
-- `GET /api/validations` - Listar validaciones
-- `POST /api/validations` - Crear validación
-- `PUT /api/validations/:id` - Actualizar validación
-- `DELETE /api/validations/:id` - Eliminar validación
-- `POST /api/validations/:id/test` - Probar validación
-
-### Archivos
-- `GET /api/files` - Listar archivos
-- `POST /api/files/upload` - Subir archivo
-- `GET /api/files/:id/download` - Descargar archivo
-- `DELETE /api/files/:id` - Eliminar archivo
-- `GET /api/files/stats` - Estadísticas de archivos
-
-## Base de Datos MySQL
-
-### Configuración
-- **Host**: tu_host
-- **Puerto**: tu_puerto
-- **Usuario**: tu_usuario
-- **Contraseña**: tu_contraseña
-- **Base de datos**: forms_db
-
-### Tablas Principales
-- **users** - Usuarios del sistema
-- **forms** - Formularios creados
-- **questions** - Preguntas de cada formulario
-- **question_options** - Opciones para preguntas
-- **skip_logic** - Configuración de lógica condicional
-- **skip_logic_conditions** - Condiciones específicas
-- **form_responses** - Respuestas completas
-- **answers** - Respuestas individuales
-
-### Nuevas Tablas (v3.0)
-- **form_templates** - Plantillas de formularios
-- **form_versions** - Versiones de formularios
-- **version_questions** - Preguntas por versión
-- **version_question_options** - Opciones por versión
-- **permissions** - Permisos del sistema
-- **roles** - Roles de usuarios
-- **role_permissions** - Relación roles-permisos
-- **user_roles** - Asignación de roles a usuarios
-- **form_permissions** - Permisos específicos por formulario
-- **notifications** - Sistema de notificaciones
-- **file_attachments** - Archivos adjuntos
-- **audit_logs** - Logs de auditoría
-- **form_analytics** - Analytics y métricas
-- **custom_reports** - Reportes personalizados
-- **custom_validations** - Validaciones personalizadas
-- **form_settings** - Configuración de formularios
-
-### Credenciales por Defecto
-- **Usuario admin**: `admin`
-- **Contraseña**: `password`
-
-## Ejemplo de Formulario con Lógica Condicional
-
-El sistema incluye un formulario de ejemplo que demuestra la funcionalidad:
-
-**"Encuesta de Satisfacción del Cliente"**
-- Pregunta 2: Si selecciona "Ninguno aún" → Salta a Pregunta 5
-- Pregunta 3: Si selecciona "Ninguno" → Salta a Pregunta 6
-- Pregunta 4: Si selecciona calificaciones bajas (1-3) → Salta a Pregunta 6
-
-## Características Técnicas
-
-### Frontend
+#### Frontend
 - **React 18** con TypeScript
 - **React Router** para navegación
 - **Context API** para estado global
@@ -546,7 +431,7 @@ El sistema incluye un formulario de ejemplo que demuestra la funcionalidad:
 - **Drag & Drop** para archivos
 - **Real-time updates** para notificaciones
 
-### Backend
+#### Backend
 - **Node.js** con Express
 - **MySQL** para almacenamiento persistente
 - **JWT** para autenticación
@@ -556,7 +441,7 @@ El sistema incluye un formulario de ejemplo que demuestra la funcionalidad:
 - **Multer** para manejo de archivos
 - **Rate limiting** para seguridad
 
-### Base de Datos
+#### Base de Datos
 - **MySQL 8.0+** para almacenamiento
 - **Transacciones** para integridad de datos
 - **Índices optimizados** para rendimiento
@@ -565,125 +450,115 @@ El sistema incluye un formulario de ejemplo que demuestra la funcionalidad:
 - **JSON columns** para configuraciones flexibles
 - **Triggers** para auditoría automática
 
-### Lógica Condicional
-- **Evaluación en tiempo real** de condiciones
-- **Cálculo dinámico** de preguntas visibles
-- **Soporte para múltiples condiciones** por pregunta
-- **Validación de formularios** considerando preguntas ocultas
+---
 
-### Exportación de Datos
-- **Generación de Excel** con formato profesional
-- **Inclusión de metadatos** (fecha, respondente)
-- **Organización por preguntas** en columnas
-- **Compatibilidad** con múltiples aplicaciones
-- **Exportación de analytics** y reportes
-- **Exportación de logs** de auditoría
+## 🛠️ Desarrollo
 
-## Uso de la Aplicación
+### 🚀 **Comandos de Desarrollo**
 
-### 1. Crear Formularios
-- Acceder a `/create`
-- Configurar preguntas y lógica condicional
-- Guardar formulario
+```bash
+# Instalar dependencias
+npm install
+cd client && npm install
 
-### 2. Gestionar Plantillas
-- Acceder a `/templates`
-- Crear plantillas desde formularios existentes
-- Usar plantillas para crear nuevos formularios
+# Ejecutar en modo desarrollo
+npm run dev          # Backend + Frontend
+npm start            # Solo backend
+cd client && npm start  # Solo frontend
 
-### 3. Gestionar Versiones
-- Acceder a `/form/:formId/versions`
-- Crear nuevas versiones de formularios
-- Activar versiones cuando estén listas
+# Construir para producción
+npm run build        # Frontend
+npm run build:server # Backend
 
-### 4. Responder Formularios
-- Acceder a `/form/:id`
-- Las preguntas se ocultan/muestran automáticamente
-- Enviar respuestas
+# Ejecutar tests
+npm test
+npm run test:watch
+```
 
-### 5. Gestionar Respuestas
-- Acceder a `/form/:id/responses`
-- Ver todas las respuestas
-- Exportar a Excel con un clic
+### 🔧 **Variables de Entorno**
 
-### 6. Ver Analytics
-- Acceder a `/analytics`
-- Ver métricas en tiempo real
-- Crear reportes personalizados
+```bash
+# .env
+JWT_SECRET=tu-clave-secreta-aqui
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=labebe12
+DB_NAME=forms_db
+PORT=5000
+NODE_ENV=development
+```
 
-### 7. Gestionar Notificaciones
-- Acceder a `/notifications`
-- Ver notificaciones no leídas
-- Marcar como leídas
+### 📝 **Scripts de Migración**
 
-### 8. Configurar Validaciones
-- Acceder a `/validations`
-- Crear validaciones personalizadas
-- Probar validaciones antes de aplicar
+```bash
+# Configuración inicial
+setup_database.bat
 
-### 9. Gestionar Archivos
-- Acceder a `/files`
-- Subir archivos con drag & drop
-- Descargar archivos adjuntos
+# Migrar funcionalidades avanzadas
+mysql -u root -plabebe12 forms_db < migrate_to_new_features.sql
 
-### 10. Ver Logs de Auditoría
-- Acceder a `/audit-logs`
-- Ver historial completo de acciones
-- Exportar logs para análisis
+# Configurar validaciones
+setup_validations.bat
 
-### 11. Configurar Validaciones
-- Acceder a `/validations` para crear validaciones globales
-- Acceder a `/create` para agregar validaciones a formularios
-- Las validaciones se aplican automáticamente en `/form/:id`
-- Validación en tiempo real con indicadores visuales
+# Migrar datos desde JSON
+node migrate_from_json.js
+```
 
-## Solución de Problemas
+---
 
-### Error de Conexión a MySQL
+## ❓ FAQ
+
+### 🤔 **Preguntas Frecuentes**
+
+#### **¿Cómo funciona la lógica condicional?**
+La lógica condicional (skip logic) permite mostrar u ocultar preguntas basándose en las respuestas del usuario. Por ejemplo, si alguien responde "No" a una pregunta, puedes saltar directamente a otra pregunta relevante.
+
+#### **¿Qué tipos de validación están disponibles?**
+- **Regex**: Expresiones regulares personalizadas
+- **Longitud**: Mínimo y máximo de caracteres
+- **Rango**: Valores numéricos mínimo y máximo
+- **Email**: Validación automática de formato
+- **URL**: Validación automática de formato
+- **Teléfono**: Validación de números telefónicos
+- **Personalizada**: Funciones JavaScript propias
+
+#### **¿Cómo exportar respuestas a Excel?**
+Ve a `/form/:id/responses` y haz clic en "Exportar a Excel". El archivo incluirá todas las respuestas organizadas por pregunta y respondente.
+
+#### **¿Cómo crear plantillas reutilizables?**
+Ve a `/templates` y crea plantillas desde formularios existentes. Luego puedes usar estas plantillas para crear nuevos formularios rápidamente.
+
+#### **¿Cómo gestionar versiones de formularios?**
+Ve a `/form/:formId/versions` para crear nuevas versiones, comparar cambios y activar versiones cuando estén listas.
+
+#### **¿Cómo configurar notificaciones?**
+Las notificaciones se generan automáticamente para nuevas respuestas. Puedes gestionarlas en `/notifications` y configurar filtros por tipo y fecha.
+
+### 🔧 **Solución de Problemas**
+
+#### **Error de Conexión a MySQL**
 1. Verificar que MySQL esté ejecutándose
 2. Verificar credenciales en `config/database.js`
 3. Ejecutar `setup_database.bat` para configurar la base de datos
 
-### Error de Migración
+#### **Error de Migración**
 1. Verificar que los archivos JSON existan en `data/`
 2. Ejecutar `node migrate_from_json.js` manualmente
 3. Verificar logs para errores específicos
 
-### Error de Autenticación
+#### **Error de Autenticación**
 1. Verificar que el usuario admin exista en la base de datos
 2. Usar credenciales por defecto: admin/password
 3. Verificar configuración JWT_SECRET
 
-### Error de Permisos
+#### **Error de Permisos**
 1. Verificar que el usuario tenga los roles correctos
 2. Asignar permisos específicos si es necesario
 3. Verificar configuración de roles en la base de datos
 
-## Contribuir
-
-1. Fork el proyecto
-2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir un Pull Request
-
-## Licencia
-
-Este proyecto está bajo la Licencia ISC. Ver el archivo `LICENSE` para más detalles.
-
-## Soporte
-
-Si encuentras problemas:
-
-1. Verifica que MySQL esté ejecutándose
-2. Verifica la configuración de la base de datos
-3. Revisa los logs del servidor
-4. Ejecuta los scripts de configuración
-5. Consulta la documentación de MySQL
-
 ---
 
-## Changelog
+## 📈 Changelog
 
 ### v3.0.0 - Funcionalidades Avanzadas Completas
 - ✅ **Plantillas de formularios** - Crear y reutilizar plantillas
@@ -709,6 +584,30 @@ Si encuentras problemas:
 - ✅ Autenticación de usuarios
 - ✅ Gestión de respuestas
 - ✅ Interfaz básica
+
+---
+
+## 🤝 Contribuir
+
+1. Fork el proyecto
+2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abrir un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia ISC. Ver el archivo `LICENSE` para más detalles.
+
+## 🆘 Soporte
+
+Si encuentras problemas:
+
+1. Verifica que MySQL esté ejecutándose
+2. Verifica la configuración de la base de datos
+3. Revisa los logs del servidor
+4. Ejecuta los scripts de configuración
+5. Consulta la documentación de MySQL
 
 ---
 

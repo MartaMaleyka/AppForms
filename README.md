@@ -438,10 +438,10 @@ Forms/
 ## Base de Datos MySQL
 
 ### Configuración
-- **Host**: localhost
-- **Puerto**: 3306
-- **Usuario**: root
-- **Contraseña**: labebe12
+- **Host**: tu_host
+- **Puerto**: tu_puerto
+- **Usuario**: tu_usuario
+- **Contraseña**: tu_contraseña
 - **Base de datos**: forms_db
 
 ### Tablas Principales

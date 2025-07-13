@@ -13,7 +13,7 @@ const Analytics = require('./models/Analytics'); // Added Analytics model
 const AuditLog = require('./models/AuditLog'); // Added AuditLog model
 const FileAttachment = require('./models/FileAttachment'); // Added FileAttachment model
 const FormTemplate = require('./models/FormTemplate'); // Added FormTemplate model
-const Validation = require('./models/Validation'); // Added Validation model
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -205,7 +205,8 @@ app.get('/api/forms/:id', async (req, res) => {
       return res.status(404).json({ error: 'Form not found' });
     }
     
-    res.json(form);
+    // Obtener validaciones para cada pregunta
+        res.json(form);
   } catch (error) {
     console.error('Error reading form:', error);
     res.status(500).json({ error: 'Error reading form' });
@@ -482,17 +483,7 @@ app.get('/api/templates', authenticateToken, async (req, res) => {
   }
 });
 
-// Validations filtradas por usuario
-app.get('/api/validations', authenticateToken, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const validations = await Validation.findByUser(userId);
-    res.json(validations);
-  } catch (error) {
-    console.error('Error fetching validations:', error);
-    res.status(500).json({ error: 'Error fetching validations' });
-  }
-});
+
 
 // Serve React app
 app.get('*', (req, res) => {

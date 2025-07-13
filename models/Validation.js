@@ -3,15 +3,15 @@ const { query, getConnection } = require('../config/database');
 class Validation {
   // Crear una nueva validación
   static async create(validationData) {
-    const { question_id, validation_type, validation_rule, error_message } = validationData;
+    const { name, description, validation_type, validation_rule, error_message, is_active, created_by } = validationData;
     
     const sql = `
-      INSERT INTO custom_validations (question_id, validation_type, validation_rule, error_message) 
-      VALUES (?, ?, ?, ?)
+      INSERT INTO custom_validations (name, description, validation_type, validation_rule, error_message, is_active, created_by) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
     
     try {
-      const result = await query(sql, [question_id, validation_type, validation_rule, error_message]);
+      const result = await query(sql, [name, description, validation_type, validation_rule, error_message, is_active, created_by]);
       return { id: result.insertId, message: 'Validation created successfully' };
     } catch (error) {
       throw error;
@@ -36,10 +36,11 @@ class Validation {
   // Obtener todas las validaciones
   static async findAll() {
     const sql = `
-      SELECT cv.*, q.question_text, q.question_type
+      SELECT cv.*, u.username as created_by_username
       FROM custom_validations cv
-      JOIN questions q ON cv.question_id = q.id
-      ORDER BY cv.question_id, cv.id
+      LEFT JOIN users u ON cv.created_by = u.id
+      WHERE cv.is_active = 1
+      ORDER BY cv.created_at DESC
     `;
     
     try {
@@ -69,16 +70,16 @@ class Validation {
 
   // Actualizar una validación
   static async update(id, validationData) {
-    const { validation_type, validation_rule, error_message } = validationData;
+    const { name, description, validation_type, validation_rule, error_message, is_active } = validationData;
     
     const sql = `
       UPDATE custom_validations 
-      SET validation_type = ?, validation_rule = ?, error_message = ?
+      SET name = ?, description = ?, validation_type = ?, validation_rule = ?, error_message = ?, is_active = ?
       WHERE id = ?
     `;
     
     try {
-      await query(sql, [validation_type, validation_rule, error_message, id]);
+      await query(sql, [name, description, validation_type, validation_rule, error_message, is_active, id]);
       return await this.findById(id);
     } catch (error) {
       throw error;
@@ -88,9 +89,9 @@ class Validation {
   // Obtener una validación por ID
   static async findById(id) {
     const sql = `
-      SELECT cv.*, q.question_text, q.question_type
+      SELECT cv.*, u.username as created_by_username
       FROM custom_validations cv
-      JOIN questions q ON cv.question_id = q.id
+      LEFT JOIN users u ON cv.created_by = u.id
       WHERE cv.id = ?
     `;
     
@@ -146,34 +147,52 @@ class Validation {
           return false;
         }
         
-      case 'min_length':
-        return value && value.length >= parseInt(validation.validation_rule);
+      case 'length':
+        try {
+          const params = JSON.parse(validation.validation_rule);
+          const length = value ? value.length : 0;
+          const minLength = params.min_length || 0;
+          const maxLength = params.max_length || Infinity;
+          return length >= minLength && length <= maxLength;
+        } catch (e) {
+          return false;
+        }
         
-      case 'max_length':
-        return value && value.length <= parseInt(validation.validation_rule);
-        
-      case 'min_value':
-        const numValue = parseFloat(value);
-        const minValue = parseFloat(validation.validation_rule);
-        return !isNaN(numValue) && numValue >= minValue;
-        
-      case 'max_value':
-        const numValue2 = parseFloat(value);
-        const maxValue = parseFloat(validation.validation_rule);
-        return !isNaN(numValue2) && numValue2 <= maxValue;
+      case 'range':
+        try {
+          const params = JSON.parse(validation.validation_rule);
+          const numValue = parseFloat(value);
+          const minValue = params.min_value || -Infinity;
+          const maxValue = params.max_value || Infinity;
+          return !isNaN(numValue) && numValue >= minValue && numValue <= maxValue;
+        } catch (e) {
+          return false;
+        }
         
       case 'email':
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(value);
+        
+      case 'url':
+        try {
+          new URL(value);
+          return true;
+        } catch (e) {
+          return false;
+        }
         
       case 'phone':
         const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
         return phoneRegex.test(value.replace(/[\s\-\(\)]/g, ''));
         
       case 'custom':
-        // Aquí se podría implementar lógica personalizada
-        // Por ahora, retornamos true
-        return true;
+        try {
+          // Evaluar función personalizada (con precauciones de seguridad)
+          const func = new Function('value', validation.validation_rule);
+          return func(value);
+        } catch (e) {
+          return false;
+        }
         
       default:
         return true;

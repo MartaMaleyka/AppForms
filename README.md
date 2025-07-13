@@ -72,6 +72,9 @@ Una aplicación web completa para crear y gestionar formularios con funcionalida
 - **Mensajes de error** personalizables
 - **Validaciones condicionales** según respuestas previas
 - **Testing de validaciones** antes de aplicar
+- **Integración completa** con FormBuilder y FormView
+- **Validación automática** mientras el usuario escribe
+- **Indicadores visuales** de errores y éxito
 
 #### 📋 **Logs de Auditoría**
 - **Registro completo** de todas las acciones
@@ -243,6 +246,46 @@ Resultado: Las preguntas 2, 3, 4 se ocultan automáticamente
 - **Testing de validaciones** antes de aplicar
 - **Validaciones condicionales** según respuestas previas
 
+### Integración Completa
+
+#### 1. **ValidationBuilder** (`/validations`)
+- Crear validaciones globales reutilizables
+- Probar validaciones antes de usar
+- Gestionar biblioteca de validaciones
+
+#### 2. **FormBuilder** (`/create`)
+- Agregar validaciones específicas por pregunta
+- Configurar reglas de validación personalizadas
+- Validaciones integradas en el constructor de formularios
+
+#### 3. **FormView** (`/form/:id`)
+- Validación automática mientras el usuario escribe
+- Indicadores visuales de errores y éxito
+- Mensajes de error personalizados
+- Prevención de envío con datos inválidos
+
+### Ejemplos de Uso
+
+#### Validación de Email
+```javascript
+Tipo: "email"
+Mensaje: "Por favor ingresa un email válido"
+```
+
+#### Validación de Longitud
+```javascript
+Tipo: "length"
+Regla: {"min_length": 8, "max_length": 50}
+Mensaje: "La contraseña debe tener entre 8 y 50 caracteres"
+```
+
+#### Validación Regex
+```javascript
+Tipo: "regex"
+Regla: "^[A-Za-z\\s]+$"
+Mensaje: "Solo se permiten letras y espacios"
+```
+
 ## 📋 Logs de Auditoría
 
 ### Información Registrada
@@ -294,6 +337,12 @@ setup_complete.bat
    ```bash
    # Migrar datos desde archivos JSON
    node migrate_from_json.js
+   ```
+
+4. **Configurar validaciones (nuevo)**
+   ```bash
+   # Ejecutar migración de validaciones
+   setup_validations.bat
    ```
 
 ### Instalación de Dependencias
@@ -581,6 +630,12 @@ El sistema incluye un formulario de ejemplo que demuestra la funcionalidad:
 - Acceder a `/audit-logs`
 - Ver historial completo de acciones
 - Exportar logs para análisis
+
+### 11. Configurar Validaciones
+- Acceder a `/validations` para crear validaciones globales
+- Acceder a `/create` para agregar validaciones a formularios
+- Las validaciones se aplican automáticamente en `/form/:id`
+- Validación en tiempo real con indicadores visuales
 
 ## Solución de Problemas
 

@@ -13,6 +13,7 @@ const Analytics = require('./models/Analytics'); // Added Analytics model
 const AuditLog = require('./models/AuditLog'); // Added AuditLog model
 const FileAttachment = require('./models/FileAttachment'); // Added FileAttachment model
 const FormTemplate = require('./models/FormTemplate'); // Added FormTemplate model
+const Validation = require('./models/Validation'); // Added Validation model
 
 
 const app = express();
@@ -483,7 +484,155 @@ app.get('/api/templates', authenticateToken, async (req, res) => {
   }
 });
 
+// Validation endpoints
+app.get('/api/validations', authenticateToken, async (req, res) => {
+  try {
+    const validations = await Validation.findAll();
+    res.json(validations);
+  } catch (error) {
+    console.error('Error fetching validations:', error);
+    res.status(500).json({ error: 'Error fetching validations' });
+  }
+});
 
+app.post('/api/validations', authenticateToken, async (req, res) => {
+  try {
+    const { name, description, validation_type, parameters, error_message, is_active } = req.body;
+    
+    if (!name || !validation_type || !error_message) {
+      return res.status(400).json({ error: 'Name, validation type and error message are required' });
+    }
+    
+    // Convertir parámetros a regla de validación
+    let validation_rule = '';
+    switch (validation_type) {
+      case 'regex':
+        validation_rule = parameters.pattern || '';
+        break;
+      case 'length':
+        validation_rule = JSON.stringify({
+          min_length: parameters.min_length,
+          max_length: parameters.max_length
+        });
+        break;
+      case 'range':
+        validation_rule = JSON.stringify({
+          min_value: parameters.min_value,
+          max_value: parameters.max_value
+        });
+        break;
+      case 'email':
+        validation_rule = 'email';
+        break;
+      case 'url':
+        validation_rule = 'url';
+        break;
+      case 'phone':
+        validation_rule = 'phone';
+        break;
+      case 'custom':
+        validation_rule = parameters.function || '';
+        break;
+      default:
+        validation_rule = '';
+    }
+    
+    const validationData = {
+      name,
+      description,
+      validation_type,
+      validation_rule,
+      error_message,
+      is_active: is_active !== false,
+      created_by: req.user.id
+    };
+    
+    const result = await Validation.create(validationData);
+    res.json({ id: result.id, message: 'Validation created successfully' });
+  } catch (error) {
+    console.error('Error creating validation:', error);
+    res.status(500).json({ error: 'Error creating validation' });
+  }
+});
+
+app.put('/api/validations/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, validation_type, parameters, error_message, is_active } = req.body;
+    
+    const validationData = {
+      name,
+      description,
+      validation_type,
+      validation_rule: JSON.stringify(parameters),
+      error_message,
+      is_active
+    };
+    
+    await Validation.update(parseInt(id), validationData);
+    res.json({ message: 'Validation updated successfully' });
+  } catch (error) {
+    console.error('Error updating validation:', error);
+    res.status(500).json({ error: 'Error updating validation' });
+  }
+});
+
+app.delete('/api/validations/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Validation.delete(parseInt(id));
+    
+    if (deleted) {
+      res.json({ message: 'Validation deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'Validation not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting validation:', error);
+    res.status(500).json({ error: 'Error deleting validation' });
+  }
+});
+
+app.post('/api/validations/test', authenticateToken, async (req, res) => {
+  try {
+    const { validation_id, test_value } = req.body;
+    
+    if (!validation_id || test_value === undefined) {
+      return res.status(400).json({ error: 'Validation ID and test value are required' });
+    }
+    
+    const validation = await Validation.findById(validation_id);
+    if (!validation) {
+      return res.status(404).json({ error: 'Validation not found' });
+    }
+    
+    const isValid = await Validation.validateSingleRule(validation, test_value);
+    
+    res.json({
+      success: isValid,
+      message: isValid ? 'Validation passed' : validation.error_message
+    });
+  } catch (error) {
+    console.error('Error testing validation:', error);
+    res.status(500).json({ error: 'Error testing validation' });
+  }
+});
+
+app.post('/api/validations/validate', async (req, res) => {
+  try {
+    const { questionId, value } = req.body;
+    
+    if (!questionId || value === undefined) {
+      return res.status(400).json({ error: 'Question ID and value are required' });
+    }
+    
+    const result = await Validation.validateValue(questionId, value);
+    res.json(result);
+  } catch (error) {
+    console.error('Error validating value:', error);
+    res.status(500).json({ error: 'Error validating value' });
+  }
+});
 
 // Serve React app
 app.get('*', (req, res) => {

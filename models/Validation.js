@@ -5,15 +5,22 @@ class Validation {
   static async create(validationData) {
     const { name, description, validation_type, validation_rule, error_message, is_active, created_by } = validationData;
     
+    console.log('Validation.create called with:', validationData);
+    
     const sql = `
       INSERT INTO custom_validations (name, description, validation_type, validation_rule, error_message, is_active, created_by) 
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
     
+    const params = [name, description, validation_type, validation_rule, error_message, is_active, created_by];
+    console.log('SQL params:', params);
+    
     try {
-      const result = await query(sql, [name, description, validation_type, validation_rule, error_message, is_active, created_by]);
+      const result = await query(sql, params);
+      console.log('Validation created successfully with ID:', result.insertId);
       return { id: result.insertId, message: 'Validation created successfully' };
     } catch (error) {
+      console.error('Database error in Validation.create:', error);
       throw error;
     }
   }

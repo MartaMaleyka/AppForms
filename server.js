@@ -14,6 +14,7 @@ const AuditLog = require('./models/AuditLog'); // Added AuditLog model
 const FileAttachment = require('./models/FileAttachment'); // Added FileAttachment model
 const FormTemplate = require('./models/FormTemplate'); // Added FormTemplate model
 const Validation = require('./models/Validation'); // Added Validation model
+const Notification = require('./models/Notification'); // Added Notification model
 
 
 const app = express();
@@ -235,6 +236,14 @@ app.post('/api/forms/:id/responses', async (req, res) => {
       respondent_name,
       answers
     });
+    
+    // Generar notificación para el creador del formulario
+    try {
+      await Notification.notifyNewResponse(formId, newResponse.id, respondent_name);
+    } catch (notificationError) {
+      console.error('Error creating notification:', notificationError);
+      // No fallar la respuesta si la notificación falla
+    }
     
     res.json({ message: 'Response submitted successfully' });
   } catch (error) {
@@ -484,7 +493,147 @@ app.get('/api/templates', authenticateToken, async (req, res) => {
   }
 });
 
-// Validation endpoints
+// Notification endpoints
+app.get('/api/notifications', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { limit = 50, offset = 0 } = req.query;
+    
+    const notifications = await Notification.findByUser(userId, parseInt(limit), parseInt(offset));
+    res.json(notifications);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ error: 'Error fetching notifications' });
+  }
+});
+
+app.get('/api/notifications/unread-count', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const unreadNotifications = await Notification.findUnreadByUser(userId, 100);
+    const count = unreadNotifications.length;
+    
+    res.json({ count });
+  } catch (error) {
+    console.error('Error fetching unread count:', error);
+    res.status(500).json({ error: 'Error fetching unread count' });
+  }
+});
+
+app.get('/api/notifications/stats', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const stats = await Notification.getStats(userId);
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching notification stats:', error);
+    res.status(500).json({ error: 'Error fetching notification stats' });
+  }
+});
+
+app.post('/api/notifications/:id/read', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    const success = await Notification.markAsRead(parseInt(id), userId);
+    
+    if (success) {
+      res.json({ message: 'Notification marked as read' });
+    } else {
+      res.status(404).json({ error: 'Notification not found' });
+    }
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    res.status(500).json({ error: 'Error marking notification as read' });
+  }
+});
+
+app.post('/api/notifications/mark-all-read', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const sql = `
+      UPDATE notifications 
+      SET is_read = TRUE 
+      WHERE user_id = ? AND is_read = FALSE
+    `;
+    const { query } = require('./config/database');
+    await query(sql, [userId]);
+    
+    res.json({ message: 'All notifications marked as read' });
+  } catch (error) {
+    console.error('Error marking all notifications as read:', error);
+    res.status(500).json({ error: 'Error marking all notifications as read' });
+  }
+});
+
+app.delete('/api/notifications/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    const success = await Notification.delete(parseInt(id), userId);
+    
+    if (success) {
+      res.json({ message: 'Notification deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'Notification not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    res.status(500).json({ error: 'Error deleting notification' });
+  }
+});
+
+app.delete('/api/notifications/clear-all', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const sql = `
+      DELETE FROM notifications 
+      WHERE user_id = ?
+    `;
+    const { query } = require('./config/database');
+    await query(sql, [userId]);
+    
+    res.json({ message: 'All notifications cleared' });
+  } catch (error) {
+    console.error('Error clearing all notifications:', error);
+    res.status(500).json({ error: 'Error clearing all notifications' });
+  }
+});
+
+// Test endpoint para crear notificaciones de prueba
+app.post('/api/notifications/test', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { title, message, type = 'info', related_form_id = null } = req.body;
+    
+    if (!title || !message) {
+      return res.status(400).json({ error: 'Title and message are required' });
+    }
+    
+    const notificationData = {
+      user_id: userId,
+      title,
+      message,
+      type,
+      related_form_id
+    };
+    
+    const result = await Notification.create(notificationData);
+    res.json({ 
+      id: result.id, 
+      message: 'Test notification created successfully',
+      notification: notificationData
+    });
+  } catch (error) {
+    console.error('Error creating test notification:', error);
+    res.status(500).json({ error: 'Error creating test notification' });
+  }
+});
+
+// Validation endpoints - DISABLED
+/*
 app.get('/api/validations', authenticateToken, async (req, res) => {
   try {
     const validations = await Validation.findAll();
@@ -495,9 +644,28 @@ app.get('/api/validations', authenticateToken, async (req, res) => {
   }
 });
 
+app.get('/api/validations/global', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const sql = `
+      SELECT * FROM custom_validations
+      WHERE question_id IS NULL AND created_by = ? AND is_active = 1
+      ORDER BY created_at DESC
+    `;
+    const { query } = require('./config/database');
+    const validations = await query(sql, [userId]);
+    res.json(validations);
+  } catch (error) {
+    console.error('Error fetching global validations:', error);
+    res.status(500).json({ error: 'Error fetching global validations' });
+  }
+});
+
 app.post('/api/validations', authenticateToken, async (req, res) => {
   try {
     const { name, description, validation_type, parameters, error_message, is_active } = req.body;
+    
+    console.log('Creating validation with data:', { name, description, validation_type, parameters, error_message, is_active });
     
     if (!name || !validation_type || !error_message) {
       return res.status(400).json({ error: 'Name, validation type and error message are required' });
@@ -547,11 +715,14 @@ app.post('/api/validations', authenticateToken, async (req, res) => {
       created_by: req.user.id
     };
     
+    console.log('Validation data to save:', validationData);
+    
     const result = await Validation.create(validationData);
     res.json({ id: result.id, message: 'Validation created successfully' });
   } catch (error) {
     console.error('Error creating validation:', error);
-    res.status(500).json({ error: 'Error creating validation' });
+    console.error('Error details:', error.message);
+    res.status(500).json({ error: `Error creating validation: ${error.message}` });
   }
 });
 
@@ -633,6 +804,7 @@ app.post('/api/validations/validate', async (req, res) => {
     res.status(500).json({ error: 'Error validating value' });
   }
 });
+*/
 
 // Serve React app
 app.get('*', (req, res) => {

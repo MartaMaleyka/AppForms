@@ -482,7 +482,7 @@ npm run test:watch
 JWT_SECRET=tu-clave-secreta-aqui
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=labebe12
+DB_PASSWORD=your_pass
 DB_NAME=forms_db
 PORT=5000
 NODE_ENV=development

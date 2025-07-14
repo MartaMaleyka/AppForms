@@ -126,7 +126,7 @@ npm start
 setup_database.bat
 
 # 2. Migrar funcionalidades avanzadas
-mysql -u root -plabebe12 forms_db < migrate_to_new_features.sql
+mysql -u root -p forms_db < migrate_to_new_features.sql
 
 # 3. Configurar validaciones
 setup_validations.bat
@@ -244,7 +244,7 @@ cd client && npm start  # Frontend
 Host: localhost
 Puerto: 3306
 Usuario: root
-Contraseña: labebe12
+Contraseña: your_pass
 Base de datos: forms_db
 ```
 
